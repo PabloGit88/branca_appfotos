@@ -1,0 +1,31 @@
+<ion-view view-title="Datos de envio de la foto" class="picture addPersons">
+<ion-content>
+	<h3><img src="img/persons_photo_title.png" class="img-responsive"></h3>
+	<form action="#" method="get" class="form-horizontal" onsubmit="return false;">
+		<div class="person" ng-repeat="person in persons">
+			<div class="form-group">
+		  		<label class="col-xs-3 control-label">Nombre</label>
+		    	<div class="col-xs-9">
+		    		<input type="text" class="form-control">
+				</div>
+			</div>
+			<div class="form-group">
+		   		<label class="col-xs-3 control-label">Apellido</label>
+		   		<div class="col-xs-9">
+		   			<input type="text" class="form-control">
+		   		</div>
+			</div>
+			<div class="form-group">
+		   		<label class="col-xs-3 control-label">Mail</label>
+		   		<div class="col-xs-9">
+		   			<input type="email" class="form-control">
+		   		</div>
+			</div>
+			
+			<button class="addRemoveButton" ng-click="addPerson($event, $index)"><img src="img/addRowButton.png" class="img-responsive"></button>
+		</div>
+	</form>
+	
+	<a href="#/session/picture/take" nav-direction="forward"><img src="img/savePictureButton.png" class="img-responsive"></a>
+  </ion-content>
+</ion-view>
