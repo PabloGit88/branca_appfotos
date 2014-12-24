@@ -1,5 +1,3 @@
-/* Empty. Add your own CSS if you like */
-
 html, body {
 	width: 100%;
 	height: 100%;
@@ -10,6 +8,36 @@ body {
 	background-size: cover;
 }
 
+textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="color"]:focus,
+.uneditable-input:focus {   
+  border-color: none;
+  box-shadow: none;
+  outline: 0 none;
+}
+
+h1, .h1, h2, .h2, h3, .h3 {
+	margin-bottom: 20px;
+}
+
+button {
+	background: transparent;
+	border: none;
+}
+
 .pane, .view {
 	background: transparent;
 	width: 78%;
@@ -17,13 +45,56 @@ body {
 }
 
 .scroll-content {
-	top: 25%;
+	top: 23%;
+}
+
+.scroll-content .scroll {
+	height: 100%;
 }
 
 .home ul li {
 	margin: 15% 0;
 }
 
+.form-group label {
+	font-family: 'open_sansregular';
+	color: #FFFFFF;
+	padding-right: 0;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"] {
+	height: 28px;
+	padding: 6px 12px;
+	background: url(../img/input_background.png) no-repeat;
+	background-size: contain;
+	font-size: 12px;
+}
+
+.form-group .date .col-xs-4 {
+	padding: 0;
+}
+
+.form-group .date input[type="text"] {
+		background: url(../img/input_small_background.png) no-repeat;
+		background-size: contain;
+}
+
 .step1 .indications {
 	margin-bottom: 10%;
+}
+
+.picture.addPersons form {
+	width: 110%;
+	height: 66%;
+	overflow-y: scroll;
+	margin-bottom: 8%;
+}
+
+.picture.addPersons form .person {
+	width: 90%;
+}
+
+.picture.addPersons form .person .addRemoveButton {
+	margin-bottom: 15px;
 }

@@ -23,27 +23,39 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'bran
 
 .config(function($stateProvider, $urlRouterProvider) {
 
-  // Ionic uses AngularUI Router which uses the concept of states
-  // Learn more here: https://github.com/angular-ui/ui-router
-  // Set up the various states which the app can be in.
-  // Each state's controller can be found in controllers.js
-  $stateProvider
+	// Ionic uses AngularUI Router which uses the concept of states
+  	// Learn more here: https://github.com/angular-ui/ui-router
+  	// Set up the various states which the app can be in.
+  	// Each state's controller can be found in controllers.js
+  	$stateProvider
 
-  // setup an abstract state for the tabs directive
+  	// Each tab has its own nav history stack:
+	.state('home', {
+		url: '/',
+   		templateUrl: 'templates/home.html'
+  	})
+  	.state('session', {
+    	url: '/session'
+  	})
+	.state('session_new', {
+    	url: '/session/new',
+    	templateUrl: 'templates/session_new.html',
+  	})
+  	.state('session_home', {
+    	url: '/session/home',
+    	templateUrl: 'templates/session_home.html',
+  	})
+	.state('session_take_picture', {
+    	url: '/session/picture/take',
+    	templateUrl: 'templates/session_take_picture.html',
+  	})
+	.state('session_picture_persons', {
+    	url: '/session/picture/persons',
+    	templateUrl: 'templates/session_picture_persons.html',
+		controller: 'PicturePersonsController'
+  	})
+  	;
 
-  // Each tab has its own nav history stack:
-  .state('home', {
-    url: '/',
-    templateUrl: 'templates/home.html',
-    controller: 'HomeController'
-  })
-  .state('step1', {
-    url: '/session/step1',
-    templateUrl: 'templates/step1.html',
-  })
-  ;
-
-  // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/');
-
+  	// if none of the above states are matched, use this as the fallback
+  	$urlRouterProvider.otherwise('/');
 });
