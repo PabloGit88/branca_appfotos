@@ -54,6 +54,11 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'bran
     	templateUrl: 'templates/session_picture_persons.html',
 		controller: 'PicturePersonsController'
   	})
+	.state('sessions_list', {
+    	url: '/sessions/list',
+    	templateUrl: 'templates/sessions_list.html',
+		controller: 'SessionsListController'
+  	})
   	;
 
   	// if none of the above states are matched, use this as the fallback

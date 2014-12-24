@@ -24,4 +24,42 @@ angular.module('branca_appfotos.controllers', [])
 		}
 	}
 })
+.controller('SessionsListController', function($scope) {
+	$scope.sessions = [{
+		place: 'un lugar',
+		date: '12/12/14',
+		operator: 'Pablo',
+		isSync: false
+	},
+	{
+		place: 'otro lugar',
+		date: '12/12/14',
+		operator: 'McPesto',
+		isSync: true
+	},
+	{
+		place: 'bombonera',
+		date: '12/12/14',
+		operator: 'Dami',
+		isSync: false
+	},
+	{
+		place: 'mi casa',
+		date: '12/12/14',
+		operator: 'Campi',
+		isSync: false
+	},
+	{
+		place: 'changos house',
+		date: '12/12/14',
+		operator: 'Diego',
+		isSync: true
+	},
+	{
+		place: 'eran los permisos',
+		date: '12/12/14',
+		operator: 'Peti',
+		isSync: false
+	}];
+})
 ;

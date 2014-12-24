@@ -1,0 +1,28 @@
+<ion-view view-title="Sesiones Anteriores" class="sessionsList">
+<ion-content>
+	<h4>Sesiónes anteriores</h4>
+	<table class="table">
+		<tr>
+	    	<th>Lugar</th>
+			<th>Fecha</th>
+			<th>Operario</th>
+			<th>Estado</th>
+			<th></th>
+		</tr>
+		<tr ng-repeat="session in sessions">	
+			<td>{{ session.place }}</td>
+			<td>{{ session.date }}</td>
+			<td>{{ session.operator }}</td>
+			<td>{{ session.isSync?'Sinc.':'No sinc.' }}</td>
+			<td><input type="checkbox" class="{{ session.isSync?'hide':'' }}"></td>
+		</tr>
+	</table>
+	
+	<div class="row actions">
+		<div class="col-xs-12">
+			<a href="#/" nav-direction="back" class="btn btn-default pull-left">VOLVER &lt;</a>
+			<a href="#/" nav-direction="back" class="btn btn-default pull-right">SINCRONIZAR &gt;</a>
+		</div>
+	</div>
+  </ion-content>
+</ion-view>
