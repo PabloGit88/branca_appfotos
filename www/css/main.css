@@ -45,6 +45,49 @@ button {
 	border: none;
 }
 
+.modal {
+	background: none;
+}
+
+.modal-dialog {
+	z-index: 99999;
+	margin: 160px 70px 0 70px;
+	background: url(../img/popup-background.png) no-repeat;
+	background-size: contain;
+	background-position: center center;
+}
+
+.modal-content {
+	background: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	border: 0;
+}
+
+.modal-body {
+	min-height: 240px;
+	padding: 0;
+}
+
+.modal-body .message {
+	padding: 60px 40px 0 40px;
+}
+
+.modal-body .actions {
+	width: 100%;
+	text-align: center;
+}
+
+.modal-body .actions a {
+	width: 45%;
+	display: inline-block;
+}
+
+.modal-body .actions a.pull-right {
+	width: 45%;
+	margin-right: 5%;
+}
+
 .pane, .view {
 	background: transparent;
 }
