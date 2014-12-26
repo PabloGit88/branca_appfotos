@@ -104,6 +104,16 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		}
 		);
 	};
+	
+	 $scope.closeSession = function() {
+		 AppContext.closeSession();
+		 $location.path('/');  
+	 };
+	
+	
+	
+	
+	
 })
 .controller('NewSessionController', function($scope, AppContext,$location, mySqlDbService) {
 	///session/picture/take 

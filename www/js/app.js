@@ -121,5 +121,10 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
         getSessionId : function(){
         	return data.SessionId;
         },
+        
+        closeSession : function(){
+        	data.ImageUri = '';
+        	data.SessionId = '';
+        },
     };
 });
