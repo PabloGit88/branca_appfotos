@@ -1,4 +1,4 @@
-angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfotos', 'db.services', 'validation.services', 'popup.services'])
+angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfotos', 'db.services', 'validation.services', 'popup.services', 'sync.services'])
 
 .controller('PicturePersonsController', function($scope , AppContext , $location, mySqlDbService) {
 	var emptyPerson = {
@@ -27,7 +27,6 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	
 	$scope.savePersonList = function( ) 
 	{
-		
 		var recipientsList = "";
 		angular.forEach($scope.persons, function(person, key) {
 			//AppContext.savePerson(person);
@@ -67,9 +66,27 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		
 		}, function (err) {
             console.error(err);
-        });;
+        });
 	};
 	$scope.init();
+	
+	$scope.syncSessions = function() {
+		// /
+		var db = AppContext.getDbConnection();
+		angular.forEach($scope.sessions, function(session, key) {
+			if (session.isSync == false){
+				mySqlDbService.findPhotosForSession(db,session.id).then(function(res) {
+					console.log(res.rows);
+		       
+				
+				
+				
+				}, function (err) {
+		            console.error(err);
+		        });
+			}
+		});
+	};
 
 })
 .controller('TakePhotoController', function($scope, camService, AppContext,$location) {
@@ -120,7 +137,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	            console.error(err);
 	        });
 		}else{
-			popupService.openPopup();
+			popupService.openFormErrorPopup();
 		}
 	};
 })

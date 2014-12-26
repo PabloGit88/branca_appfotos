@@ -15,8 +15,10 @@
     -->
 
     <!-- ionic/angularjs js -->
-    <script src="lib/ionic/js/ionic.bundle.js"></script>
-
+	<script src="lib/ionic/js/ionic.bundle.js"></script>
+	<script src="lib/jquery/dist/jquery.min.js"></script>
+	<script src="lib/bootstrap/dist/js/bootstrap.min.js"></script>
+	
     <!-- cordova script (this will be a 404 during development) -->
     <script src="lib/ngCordova/dist/ng-cordova.js"></script>
     <script src="cordova.js"></script>
@@ -30,6 +32,7 @@
     <script src="js/db-services.js"></script>
 	<script src="js/validation-services.js"></script>
 	<script src="js/popup-services.js"></script>
+	<script src="js/sync-services.js"></script>
  
   </head>
   
@@ -40,5 +43,22 @@
       have templates inline in this html file if you'd like).
     -->
     <ion-nav-view></ion-nav-view>
+
+	<!-- Popup -->
+	<div class="modal fade bs-example-modal-sm" id="basicPopup" tabindex="-1" role="dialog" aria-labelledby="popup" aria-hidden="true">
+	  <div class="modal-dialog modal-sm">
+	    <div class="modal-content">
+			<div class="modal-body">
+				<img src="img/savePhotoMessage.png" class="img-responsive message savePhoto" style="display:none;">
+				<img src="img/formErrorMessage.png" class="img-responsive message formError">
+			 	<div class="actions bottomButton">
+					<a href="#" class="acceptButton" style="display: none;"><img src="img/acceptPopupButton.png" class="img-responsive"></a>
+					<a href="#" class="cancelButton" style="display: none;" data-dismiss="modal"><img src="img/cancelPopupButton.png" class="img-responsive"></a>
+					<a href="#" class="acceptDismissButton" data-dismiss="modal"><img src="img/acceptPopupButton.png" class="img-responsive"></a>
+				</div>
+			</div>
+	    </div>
+	  </div>
+	</div>
   </body>
 </html>

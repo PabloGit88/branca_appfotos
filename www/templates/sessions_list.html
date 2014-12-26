@@ -14,14 +14,15 @@
 			<td>{{ session.date }}</td>
 			<td>{{ session.operatorFirstName + ' ' + session.operatorLastName  }}</td>
 			<td>{{ session.isSync?'Sinc.':'No sinc.' }}</td>
-			<td><input type="checkbox" ng-disabled="session.isSync" ng-checked="session.isSync"></td>
+			<!--  CORREGIR NG-MODEL, AHORA ESTA SINCRONIZANDO TODOS -->
+			<td><input type="checkbox" value="session.isSync" ng-disabled="session.isSync" ng-checked="session.isSync"></td>
 		</tr>
 	</table>
   </ion-content>
 	<div class="row actions bottomButton">
 		<div class="col-xs-12 centerContent">
 			<a href="#/" nav-direction="back" class="btn btn-default pull-left">VOLVER &lt;</a>
-			<a href="#/" nav-direction="back" class="btn btn-default pull-right">SINCRONIZAR &gt;</a>
+			<a href="#" nav-direction="back" ng-click="syncSessions();" class="btn btn-default pull-right">SINCRONIZAR &gt;</a>
 		</div>
 	</div>
 </ion-view>
