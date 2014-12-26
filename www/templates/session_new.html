@@ -6,13 +6,13 @@
 			<div class="form-group">
 		  		<label for="session_operator_firstname" class="col-xs-3 control-label">Nombre</label>
 		    	<div class="col-xs-9">
-		    		<input type="text" class="form-control" id="session_operator_firstname" name="session[operator_firstname]">
+		    		<input type="text" class="form-control" id="session_operator_firstname" name="session[operator_firstname]" ng-model="session.operatorFirstName">
 				</div>
 			</div>
 			<div class="form-group">
 		   		<label for="session_operator_lastname" class="col-xs-3 control-label">Apellido</label>
 		   		<div class="col-xs-9">
-		   			<input type="text" class="form-control" id="session_operator_lastname" name="session[operator_lastname]">
+		   			<input type="text" class="form-control" id="session_operator_lastname" name="session[operator_lastname]"  ng-model="session.operatorLastName">
 		   		</div>
 			</div>
 		</div>
@@ -21,37 +21,37 @@
 			<div class="form-group">
 			 	<label for="session_place" class="col-xs-3 control-label">Lugar</label>
 			    <div class="col-xs-9">
-			    	<input type="text" class="form-control" id="session_place" name="session[place]">
+			    	<input type="text" class="form-control" id="session_place" name="session[place]" ng-model="session.place">
 			    </div>
 			</div>
 			<div class="form-group">
 			   	<label for="session_state" class="col-xs-3 control-label">Provincia</label>
 			   	<div class="col-xs-9">
-			   		<input type="text" class="form-control" id="session_state" name="session[state]">
+			   		<input type="text" class="form-control" id="session_state" name="session[state]" ng-model="session.state">
 			   	</div>
 			</div>
 			<div class="form-group">
 			   	<label for="session_city" class="col-xs-3 control-label">Ciudad</label>
 			   	<div class="col-xs-9">
-			   		<input type="text" class="form-control" id="session_city" name="session[city]">
+			   		<input type="text" class="form-control" id="session_city" name="session[city]" ng-model="session.city">
 			   	</div>
 			</div>
 			<div class="form-group">
 			   	<label for="session_date" class="col-xs-3 control-label">Fecha</label>
 			   	<div class="col-xs-9 date">
 				   	<div class="col-xs-4">
-			   			<input type="text" class="form-control" id="session_date" name="session[date][day]">
+			   			<input type="text" class="form-control" id="session_date"  ng-model="session.day">
 					</div>
 					<div class="col-xs-4">
-						<input type="text" class="form-control" name="session[date][month]">
+						<input type="text" class="form-control" name="session[date][month]"  ng-model="session.month">
 					</div>
 					<div class="col-xs-4">
-						<input type="text" class="form-control" name="session[date][year]">
+						<input type="text" class="form-control" name="session[date][year]" ng-model="session.year">
 					</div>
 			   	</div>
 			</div>
 		</div>
-		<a href="#/session/picture/take"><img src="img/nextButton.png" class="img-responsive"></a>
+		<a href="#" ng-click="saveSession();"><img src="img/nextButton.png" class="img-responsive"></a>
 	</form>
   </ion-content>
 </ion-view>

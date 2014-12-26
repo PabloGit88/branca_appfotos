@@ -5,9 +5,12 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'branca_appfotos.services'])
 
-.run(function($ionicPlatform) {
+var db = null;
+
+angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.services'])
+
+.run(function($ionicPlatform, mySqlDbService, AppContext) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -18,6 +21,17 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'bran
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
+    
+    db = mySqlDbService.openOrCreateDb('photo_email_branca.db');
+	
+    var sessionTableData = "id integer primary key ,name varchar(20) NOT NULL, last_name varchar(20) NOT NULL, place varchar(20) NOT NULL,  state varchar(20) NOT NULL,  city varchar(20) NOT NULL,  date date NOT NULL";
+	mySqlDbService.createTableIfNotExist(db, "sessions" ,sessionTableData );
+	
+	var destinatariesTableData = "id_session integer primary key, uri_photo varchar(256) NOT NULL,  recipients mediumtext NOT NULL, integer synchronized";
+	mySqlDbService.createTableIfNotExist(db, "session_photo" ,destinatariesTableData );
+	
+	AppContext.setDbConnection(db);
+    
   });
 })
 
@@ -40,6 +54,7 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'bran
 	.state('session_new', {
     	url: '/session/new',
     	templateUrl: 'templates/session_new.html',
+    	controller: 'NewSessionController'
   	})
   	.state('session_home', {
     	url: '/session/home',
@@ -48,6 +63,7 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'bran
 	.state('session_take_picture', {
     	url: '/session/picture/take',
     	templateUrl: 'templates/session_take_picture.html',
+    	controller: 'TakePhotoController'
   	})
 	.state('session_picture_persons', {
     	url: '/session/picture/persons',
@@ -63,4 +79,37 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'bran
 
   	// if none of the above states are matched, use this as the fallback
   	$urlRouterProvider.otherwise('/');
+}).factory('AppContext', function () {
+
+    var data = {
+        ImageUri: '',
+        PersonStringList: '',
+        DbConnection : '',
+    };
+
+    return {
+        getImageUri: function () {
+            return data.ImageUri;
+        },
+        setImageUri: function (imageUri) {
+            data.ImageUri = imageUri;
+        },
+        getDbConnection : function(){
+        	return data.DbConnection;
+        },
+        
+        setDbConnection : function (dbConnection){
+        	data.DbConnection = dbConnection;
+        },
+        
+        savePerson : function(person)
+        {        
+        	//data.PersonList =  data.PersonList + person.t
+        	if ( person.firstname != '' &&   person.lastname != '' &&  person.email != ''  )
+        	{
+        		data.PersonStringList  = data.PersonStringList + person.firstname + ';'+ person.lastname + ';'+ person.email  + ',';
+        		console.log(data.PersonStringList);
+        	}
+        },
+    };
 });
