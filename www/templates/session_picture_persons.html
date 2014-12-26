@@ -1,6 +1,6 @@
 <ion-view view-title="Datos de envio de la foto" class="picture addPersons">
 <ion-content>
-	<h3><img src="img/persons_photo_title.png" class="img-responsive"></h3>
+	<h3 class="title"><img src="img/persons_photo_title.png" class="img-responsive"></h3>
 	<form action="#" method="get" class="form-horizontal" onsubmit="return false;">
 		<div class="person" ng-repeat="person in persons">
 			<div class="form-group">
@@ -26,6 +26,6 @@
 		</div>
 	</form>
 	
-	<a href="#" ng-click="savePersonList();" nav-direction="forward"><img src="img/savePictureButton.png" class="img-responsive"></a>
   </ion-content>
+	<a href="#" ng-click="savePersonList();" nav-direction="forward" class="bottomButton"><img src="img/savePictureButton.png" class="img-responsive"></a>
 </ion-view>

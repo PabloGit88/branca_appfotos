@@ -21,7 +21,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 				email: ''
 			}); 
 		}else {
-			$scope.persons.splice($index, 1);
+			$scope.persons.splice($index+1, 1);
 		}
 	};
 	

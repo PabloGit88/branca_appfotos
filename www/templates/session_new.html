@@ -2,7 +2,7 @@
 <ion-content>
 	<form action="#" method="get" class="form-horizontal">
 		<div class="operatorData">
-			<h3><img src="img/datos_del_operario.png" class="img-responsive"></h3>
+			<h3 class="title"><img src="img/datos_del_operario.png" class="img-responsive"></h3>
 			<div class="form-group">
 		  		<label for="session_operator_firstname" class="col-xs-3 control-label">Nombre</label>
 		    	<div class="col-xs-9">
@@ -17,7 +17,7 @@
 			</div>
 		</div>
 		<div class="sessionData">
-			<h3><img src="img/datos_de_sesion.png" class="img-responsive"></h3>
+			<h3 class="title"><img src="img/datos_de_sesion.png" class="img-responsive"></h3>
 			<div class="form-group">
 			 	<label for="session_place" class="col-xs-3 control-label">Lugar</label>
 			    <div class="col-xs-9">
@@ -51,7 +51,9 @@
 			   	</div>
 			</div>
 		</div>
-		<a href="#" ng-click="saveSession();"><img src="img/nextButton.png" class="img-responsive"></a>
+		
 	</form>
+	
   </ion-content>
+<a href="#" ng-click="saveSession();" class="bottomButton"><img src="img/nextButton.png" class="img-responsive"></a>
 </ion-view>

@@ -51,12 +51,16 @@ button {
 	margin: 0 auto;
 }
 
-.scroll-content {
+/*.scroll-content {
 	top: 23%;
-}
+}*/
 
 .scroll-content .scroll {
-	height: 100%;
+	margin-top: 50%;
+}
+
+.home ul {
+	padding-top: 10px;
 }
 
 .home ul li {
@@ -77,15 +81,17 @@ button {
 	color: #FFFFFF;
 	padding-right: 0;
 	font-size: 18px;
+	line-height: 38px;
 }
 
 .form-group input[type="text"],
 .form-group input[type="email"] {
 	height: 43px;
-	padding: 6px 12px;
+	padding: 6px 18px;
 	background: url(../img/input_background.png) no-repeat;
 	background-size: contain;
-	font-size: 12px;
+	background-position: center center;
+	font-size: 16px;
 }
 
 .form-group .date .col-xs-4 {
@@ -103,10 +109,20 @@ button {
 
 .form-group .date input[name="session[date][year]"] {
 	background-position: right;
+	padding-left: 28px;
 }
 
 .step1 .indications {
 	margin-bottom: 10%;
+}
+
+.picture.addPersons ion-content {
+    height: 56%;
+	top: 23%;
+}
+
+.picture.addPersons ion-content.scroll-content .scroll {
+	margin-top: 0;
 }
 
 .picture.addPersons form {
@@ -124,12 +140,16 @@ button {
 	margin-bottom: 15px;
 }
 
+.sessionsList h4 {
+	font-size: 24px;
+}
+
 .sessionsList table {
 	width: 99%;
 }
 .sessionsList table tr th,
 .sessionsList table tr td {
-	border: 1px solid #FFFFFF;
+	border: 3px solid #FFFFFF;
 }
 
 .sessionsList table tr th:last-child {
@@ -138,11 +158,11 @@ button {
 
 .sessionsList table tr th {
 	text-transform: uppercase;
-	font-size: 12px;
+	font-size: 18px;
 }
 
 .sessionsList table tr td {
-	font-size: 10px;
+	font-size: 16px;
 }
 
 .sessionsList .actions {
