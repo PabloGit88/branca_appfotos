@@ -12,7 +12,7 @@
 			<div class="form-group">
 		   		<label for="session_operator_lastname" class="col-xs-3 control-label">Apellido</label>
 		   		<div class="col-xs-9">
-		   			<input type="text" class="form-control" id="session_operator_lastname" name="session[operator_lastname]"  ng-model="session.operatorLastName">
+		   			<input type="text" class="form-control" id="session_operator_lastname" name="session[operator_lastname]" ng-model="session.operatorLastName">
 		   		</div>
 			</div>
 		</div>
@@ -51,12 +51,11 @@
 			   	</div>
 			</div>
 		</div>
-		
 	</form>
 </ion-content>
 <div class="row actions bottomButton">
 	<div class="col-xs-12 centerContent">
-		<a href="#" ng-click="saveSession();" class="bottomButton"><img src="img/nextButton.png" class="img-responsive"></a>
+		<a href="#" ng-click="saveSession($event);" class="bottomButton"><img src="img/nextButton.png" class="img-responsive"></a>
 	</div>
 </div>
 </ion-view>
