@@ -120,7 +120,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	            console.error(err);
 	        });
 		}else{
-			popupService.openPopup();
+			popupService.openFormErrorPopup();
 		}
 	};
 })

@@ -3,9 +3,26 @@ angular.module('popup.services', [])
 .factory('popupService', function() 
 {
 	return {
-		openPopup: function()
+		openFormErrorPopup: function()
 		{
-			alert('error');
+			$('#basicPopup .message').hide();
+			$('#basicPopup .message.formError').show();
+			
+			$('#basicPopup .actions a').hide();
+			$('#basicPopup .actions a.acceptDismissButton').show();
+			
+			$('#basicPopup').modal('show');
+		},
+		openConfirmSavePhotoPopup: function()
+		{
+			$('#basicPopup .message').hide();
+			$('#basicPopup .message.savePhoto').show();
+			
+			$('#basicPopup .actions a').hide();
+			$('#basicPopup .actions a.acceptButton').show();
+			$('#basicPopup .actions a.cancelButton').show();
+			
+			$('#basicPopup').modal('show');
 		}
 	};
 });
