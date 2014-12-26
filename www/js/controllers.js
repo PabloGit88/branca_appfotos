@@ -43,43 +43,34 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	}
 	
 })
-.controller('SessionsListController', function($scope) {
-	$scope.sessions = [{
-		place: 'un lugar',
-		date: '12/12/14',
-		operator: 'Pablo',
-		isSync: false
-	},
-	{
-		place: 'otro lugar',
-		date: '12/12/14',
-		operator: 'McPesto',
-		isSync: true
-	},
-	{
-		place: 'bombonera',
-		date: '12/12/14',
-		operator: 'Dami',
-		isSync: false
-	},
-	{
-		place: 'mi casa',
-		date: '12/12/14',
-		operator: 'Campi',
-		isSync: false
-	},
-	{
-		place: 'changos house',
-		date: '12/12/14',
-		operator: 'Diego',
-		isSync: true
-	},
-	{
-		place: 'eran los permisos',
-		date: '12/12/14',
-		operator: 'Peti',
-		isSync: false
-	}];
+.controller('SessionsListController', function($scope, AppContext, mySqlDbService) {
+	
+	$scope.sessions = [];
+	$scope.init = function (){
+		var db = AppContext.getDbConnection();
+		mySqlDbService.retrieveSessions(db).then(function(res) {
+            console.log("select session result  -> " + res);
+            for (var i=0; i< res.rows.length; i++){
+            	var sessionObject = Session();
+            	var item = res.rows.item(i);
+            	sessionObject.operatorFirstName = item.name;
+            	sessionObject.operatorLastName = item.last_name;
+            	sessionObject.city = item.city;
+            	sessionObject.place = item.place;
+            	sessionObject.state =  item.place;
+            	sessionObject.date = item.date;
+            	sessionObject.id = item.id;
+            	sessionObject.isSync = item.isSync;
+            	console.log("Session Object: " + sessionObject);
+            	$scope.sessions.push(sessionObject);
+            }
+		
+		}, function (err) {
+            console.error(err);
+        });;
+	};
+	$scope.init();
+
 })
 .controller('TakePhotoController', function($scope, camService, AppContext,$location) {
 	 $scope.takePhoto = function() {
@@ -106,6 +97,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	};
 	
 	 $scope.closeSession = function() {
+		 console.log("Session Closed.");
 		 AppContext.closeSession();
 		 $location.path('/');  
 	 };
@@ -122,7 +114,8 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	mySqlDbService.saveSession(AppContext.getDbConnection(), $scope.session ).then(function(res) {
 			console.log("NewSessionController idSession: " +  res.insertId);
 			AppContext.saveSessionId( res.insertId); 
-			 $location.path('/session/picture/take'); 
+			$scope.session = Session();
+			$location.path('/session/picture/take'); 
         }, function (err) {
             console.error(err);
         });

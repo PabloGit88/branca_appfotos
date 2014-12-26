@@ -14,21 +14,23 @@ angular.module('db.services', ['ngCordova'])
 	
 	saveSession : function(db, session){
 		var date = session.day + "/" + session.month + "/" + session.year;
-		var statement = "INSERT INTO sessions(name, last_name, place, state, city, date  ) VALUES ( ?,?,?,?,?,?)";
-		return  $cordovaSQLite.execute(db,statement , [session.operatorFirstName, session.operatorLastName, session.place, session.state, session.city, date ]);
+		var statement = "INSERT INTO sessions(name, last_name, place, state, city, date ,isSync ) VALUES ( ?,?,?,?,?,?,?)";
+		return  $cordovaSQLite.execute(db,statement , [session.operatorFirstName, session.operatorLastName, session.place, session.state, session.city, date , 0 ]);
 	},
 	
-	savePhoto : function(db , imageUri , sesssionId, recipients , syncronized ){
-		var statement = "INSERT INTO session_photo( uri_photo, id_session, recipients, synchronized ) VALUES ( ?,?,?,?)";
-		$cordovaSQLite.execute(db,statement , [imageUri, sesssionId, recipients, syncronized ]).then(function(res) {
+	savePhoto : function(db , imageUri , sesssionId, recipients , isSync ){
+		var statement = "INSERT INTO session_photo( uri_photo, id_session, recipients, isSync ) VALUES ( ?,?,?,?)";
+		$cordovaSQLite.execute(db,statement , [imageUri, sesssionId, recipients, isSync ]).then(function(res) {
             console.log("INSERT ID -> " + res.insertId);
         }, function (err) {
             console.error(err);
         });
-	}
+	},
 	
-	
-	
+	retrieveSessions : function(db) {
+		var statement = "select * from sessions";
+		return $cordovaSQLite.execute(db,statement , []);
+	},
 	
 	
  }

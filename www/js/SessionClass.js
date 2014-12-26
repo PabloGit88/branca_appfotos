@@ -1,21 +1,10 @@
 var Session = (function () {
 
   //Immediately returns an anonymous function which builds our modules 
-  return function (operatorFirstName, operatorLastName, place,  city , state, day, month, year) {        
+  return function (operatorFirstName, operatorLastName, place,  city , state, day, month, year, isSync,date, id) {        
         
-        console.log("Create Session called with " + operatorFirstName + "...");
-        
-        var localOperatorFirstName = operatorFirstName;
-		var localOperatorLastName = operatorLastName;
-		var localPlace  = place;
-		var localState = state ;
-		var localCity = city;
-		var localDay = day;
-		var localMonth = month;
-		var localYear = year;
-
+       console.log("Create Session called with " + operatorFirstName + "...");
 	   return {
-	   
 	    operatorFirstName :  operatorFirstName,
 		operatorLastName :  operatorLastName,
 		place :  place,
@@ -23,8 +12,10 @@ var Session = (function () {
 		city :  city,
 		day :  day,
 		month :  month,
-		year :  year
+		year :  year,
+		isSync : isSync,
+		date : date, 
+		id: id,
 	 }
-      
   }
 })();
