@@ -38,8 +38,8 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		var imageUri = AppContext.getImageUri();
 		var sesssionId = AppContext.getSessionId();
 		console.log("Saving Photo : " + imageUri +  " -  " + sesssionId +  "  - " +  recipientsList);
-		//mySqlDbService.savePhoto(db , imageUri , sesssionId, recipientsList , 0);
-		//$location.path('/session/picture/take');  
+		mySqlDbService.savePhoto(db , imageUri , sesssionId, recipientsList , 0);
+		$location.path('/session/picture/take');  
 	}
 	
 })
@@ -109,10 +109,14 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	///session/picture/take 
 	$scope.session = Session();
 	$scope.saveSession = function() {
-		var idSession = mySqlDbService.saveSession(AppContext.getDbConnection(), $scope.session );
-		console.log("NewSessionController idSession: " + idSession);
-		AppContext.saveSessionId(idSession); 
-		 $location.path('/session/picture/take'); 
+	mySqlDbService.saveSession(AppContext.getDbConnection(), $scope.session ).then(function(res) {
+			console.log("NewSessionController idSession: " +  res.insertId);
+			AppContext.saveSessionId( res.insertId); 
+			 $location.path('/session/picture/take'); 
+        }, function (err) {
+            console.error(err);
+        });
+	
 	};
 })
 ;

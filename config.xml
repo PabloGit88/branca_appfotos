@@ -10,6 +10,7 @@
   <content src="index.html"/>
   <access origin="*"/>
   <preference name="webviewbounce" value="false"/>
+  <preference name="orientation" value="portrait" />
   <preference name="UIWebViewBounce" value="false"/>
   <preference name="DisallowOverscroll" value="true"/>
   <preference name="BackupWebStorage" value="none"/>

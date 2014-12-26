@@ -14,15 +14,8 @@ angular.module('db.services', ['ngCordova'])
 	
 	saveSession : function(db, session){
 		var date = session.day + "/" + session.month + "/" + session.year;
-		var idSession;
 		var statement = "INSERT INTO sessions(name, last_name, place, state, city, date  ) VALUES ( ?,?,?,?,?,?)";
-		$cordovaSQLite.execute(db,statement , [session.operatorFirstName, session.operatorLastName, session.place, session.state, session.city, date ]).then(function(res) {
-            idSession = res.insertId;
-			console.log("INSERT ID -> " + idSession);
-			return idSession;
-        }, function (err) {
-            console.error(err);
-        });
+		return  $cordovaSQLite.execute(db,statement , [session.operatorFirstName, session.operatorLastName, session.place, session.state, session.city, date ]);
 	},
 	
 	savePhoto : function(db , imageUri , sesssionId, recipients , syncronized ){
