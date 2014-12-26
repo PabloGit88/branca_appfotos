@@ -27,7 +27,7 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
     var sessionTableData = "id integer primary key ,name varchar(20) NOT NULL, last_name varchar(20) NOT NULL, place varchar(20) NOT NULL,  state varchar(20) NOT NULL,  city varchar(20) NOT NULL,  date date NOT NULL";
 	mySqlDbService.createTableIfNotExist(db, "sessions" ,sessionTableData );
 	
-	var destinatariesTableData = "id_session integer primary key, uri_photo varchar(256) NOT NULL,  recipients mediumtext NOT NULL, integer synchronized";
+	var destinatariesTableData = "id_photo integer primary key,  uri_photo varchar(512) NOT NULL, id_session integer,  recipients mediumtext NOT NULL, synchronized integer";
 	mySqlDbService.createTableIfNotExist(db, "session_photo" ,destinatariesTableData );
 	
 	AppContext.setDbConnection(db);
@@ -85,6 +85,7 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
         ImageUri: '',
         PersonStringList: '',
         DbConnection : '',
+        SessionId : '',
     };
 
     return {
@@ -110,6 +111,15 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
         		data.PersonStringList  = data.PersonStringList + person.firstname + ';'+ person.lastname + ';'+ person.email  + ',';
         		console.log(data.PersonStringList);
         	}
+        },
+        getPersons : function() {
+        	return data.PersonStringList;
+        },
+        saveSessionId : function (idSession){
+        	data.SessionId = idSession;
+        },
+        getSessionId : function(){
+        	return data.SessionId;
         },
     };
 });

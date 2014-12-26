@@ -1,7 +1,8 @@
 angular.module('db.services', ['ngCordova'])
 .factory('mySqlDbService', ['$q','$cordovaSQLite', function($q, $cordovaSQLite) {
    return {
-	openOrCreateDb : function(dbName){
+	
+	   openOrCreateDb : function(dbName){
 		 var db = null;
 		 db = $cordovaSQLite.openDB(dbName);
 		 return db;
@@ -13,13 +14,25 @@ angular.module('db.services', ['ngCordova'])
 	
 	saveSession : function(db, session){
 		var date = session.day + "/" + session.month + "/" + session.year;
+		var idSession;
 		var statement = "INSERT INTO sessions(name, last_name, place, state, city, date  ) VALUES ( ?,?,?,?,?,?)";
 		$cordovaSQLite.execute(db,statement , [session.operatorFirstName, session.operatorLastName, session.place, session.state, session.city, date ]).then(function(res) {
-            console.log("INSERT ID -> " + res.insertId);
+            idSession = res.insertId;
+			console.log("INSERT ID -> " + idSession);
+			return idSession;
         }, function (err) {
             console.error(err);
         });
 	},
+	
+	savePhoto : function(db , imageUri , sesssionId, recipients , syncronized ){
+		var statement = "INSERT INTO session_photo( uri_photo, id_session, recipients, synchronized ) VALUES ( ?,?,?,?)";
+		$cordovaSQLite.execute(db,statement , [imageUri, sesssionId, recipients, syncronized ]).then(function(res) {
+            console.log("INSERT ID -> " + res.insertId);
+        }, function (err) {
+            console.error(err);
+        });
+	}
 	
 	
 	

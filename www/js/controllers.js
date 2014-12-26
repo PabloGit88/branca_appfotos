@@ -1,6 +1,6 @@
 angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfotos', 'db.services'])
 
-.controller('PicturePersonsController', function($scope , AppContext , $location ) {
+.controller('PicturePersonsController', function($scope , AppContext , $location, mySqlDbService) {
 	var emptyPerson = {
 		firstname: '',
 		lastname: '',
@@ -27,10 +27,19 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	
 	$scope.savePersonList = function( ) 
 	{
+		
+		var recipientsList = "";
 		angular.forEach($scope.persons, function(person, key) {
-			AppContext.savePerson(person);
+			//AppContext.savePerson(person);
+			recipientsList = recipientsList + person.firstname + ';'+ person.lastname + ';'+ person.email  + ',';
+		
 		});
-		$location.path('/session/picture/take');  
+		var db =  AppContext.getDbConnection();
+		var imageUri = AppContext.getImageUri();
+		var sesssionId = AppContext.getSessionId();
+		console.log("Saving Photo : " + imageUri +  " -  " + sesssionId +  "  - " +  recipientsList);
+		//mySqlDbService.savePhoto(db , imageUri , sesssionId, recipientsList , 0);
+		//$location.path('/session/picture/take');  
 	}
 	
 })
@@ -100,8 +109,10 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	///session/picture/take 
 	$scope.session = Session();
 	$scope.saveSession = function() {
-		mySqlDbService.saveSession(AppContext.getDbConnection(), $scope.session );
-	
+		var idSession = mySqlDbService.saveSession(AppContext.getDbConnection(), $scope.session );
+		console.log("NewSessionController idSession: " + idSession);
+		AppContext.saveSessionId(idSession); 
+		 $location.path('/session/picture/take'); 
 	};
 })
 ;
