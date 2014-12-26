@@ -47,13 +47,12 @@ button {
 
 .pane, .view {
 	background: transparent;
+}
+
+.scroll-content, .centerContent {
 	width: 78%;
 	margin: 0 auto;
 }
-
-/*.scroll-content {
-	top: 23%;
-}*/
 
 .scroll-content .scroll {
 	margin-top: 50%;
