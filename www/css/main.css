@@ -101,12 +101,22 @@ button {
 	margin-top: 50%;
 }
 
+
+.home h3 {
+	padding-top: 50px;
+	font-size: 20px;
+}
+
 .home ul {
 	padding-top: 10px;
 }
 
 .home ul li {
 	margin: 15% 0;
+}
+
+.home ul li:first-child {
+	margin-top: 0;
 }
 
 .sessionData {
