@@ -15,7 +15,7 @@ angular.module('photo.services', [])
       return q.promise;
     },
     
-    upload : function (imageURI) {
+    upload : function (imageURI ) {
             var ft = new FileTransfer(),
             options = new FileUploadOptions();
 
@@ -27,11 +27,9 @@ angular.module('photo.services', [])
             
              ft.upload(imageURI, serverURL,
                 function (e) {
-                   alert('ok');
                    console.log(e);
                 },
                 function (e) {
-                    alert("Upload failed");
                     console.log(e);
                 }, options);
     },

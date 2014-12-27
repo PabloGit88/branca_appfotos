@@ -36,5 +36,14 @@ angular.module('db.services', ['ngCordova'])
 		var statement = "SELECT id_photo, uri_photo, id_session,recipients,  isSync	FROM session_photo where id_session = ? and isSync = ?";
 		return $cordovaSQLite.execute(db,statement , [sessionId, 0]);
 	},
+	updatePhotoAsSynchronized : function(db, idPhoto, isSync){
+		var statement = "UPDATE session_photo SET isSync = ? where id_photo = ?";
+		return $cordovaSQLite.execute(db,statement , [isSync, idPhoto]);
+	},
+	
+	updateSessionAsSynchronized : function(db, idSession, isSync){
+		var statement = "UPDATE sessions SET isSync = ? where id = ?";
+		return $cordovaSQLite.execute(db,statement , [isSync, idSession]);
+	},
  }
 }])
