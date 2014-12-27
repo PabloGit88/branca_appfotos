@@ -23,6 +23,26 @@ angular.module('popup.services', [])
 			$('#basicPopup .actions a.cancelButton').show();
 			
 			$('#basicPopup').modal('show');
+		},
+		openErrorConnectionPopup: function()
+		{
+			$('#basicPopup .message').hide();
+			$('#basicPopup .message.errorConnection').show();
+			
+			$('#basicPopup .actions a').hide();
+			$('#basicPopup .actions a.acceptDismissButton').show();
+			
+			$('#basicPopup').modal('show');
+		},
+		openSyncSuccessPopup: function()
+		{
+			$('#basicPopup .message').hide();
+			$('#basicPopup .message.syncSuccess').show();
+			
+			$('#basicPopup .actions a').hide();
+			$('#basicPopup .actions a.finalizeButton').show();
+			
+			$('#basicPopup').modal('show');
 		}
 	};
 });
