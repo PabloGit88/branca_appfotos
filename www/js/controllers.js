@@ -116,8 +116,15 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 										syncService.uploadPhoto(session, imageUri , imageId, recipients, success, error );
 								 }
 								 if ( !hadError){
-									 mySqlDbService.updateSessionAsSynchronized(db, session.id, 1);
-									 
+									 console.log("fotos subidas correctamente sincronizando.");
+									 mySqlDbService.updateSessionAsSynchronized(db, session.id, 1).then(
+											 function(res){
+												session.isSync = 1;
+												session.hasToSync = 0;
+											 },
+											 function(err){
+												 console.log(err);
+											 });
 								 }
 							}, function (err) {
 					            console.error(err);
