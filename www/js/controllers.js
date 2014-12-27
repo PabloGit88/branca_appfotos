@@ -71,9 +71,10 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	$scope.init();
 	
 	
-	var success  =  function(session, imageUri , imageId, recipients){
+	var success  =  function(session, imageUri , imageId, recipients)
+	{
 		var db = AppContext.getDbConnection();
-		mySqlDbService.updatePhotoAsSynchronized(db, imageId , 1;
+		mySqlDbService.updatePhotoAsSynchronized(db, imageId , 1);
 	};
 	
 	var hadError = false;
@@ -97,9 +98,9 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 				"place" : session.place,
 				"state" : session.state,
 				"city" : session.city,
-				"date" : session.date,
+				"date" : session.date,	
 			};
-			if (session.isSync == false){
+			if (session.isSync == false && session.hasToSync){
 				syncService.saveSession(saveSessionUrl, dataReq).success(function(data,status, headers,config ){
 					//TODO : Validar que la sesión no se guarde multiples veces. 
 					console.log("data post save session:");
@@ -115,20 +116,22 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 										syncService.uploadPhoto(session, imageUri , imageId, recipients, success, error );
 								 }
 								 if ( !hadError){
-									 //mySqlDbService.updateSessionAsSynchronized(db, session.id, 1);
-									 hadError = false;
+									 mySqlDbService.updateSessionAsSynchronized(db, session.id, 1);
+									 
 								 }
 							}, function (err) {
 					            console.error(err);
 					        });
 					}//else -> hubo error... analizar que hacer.
 				}).error(
-					function(){
+					function(e){
+						console.log(e);
 						console.log("error de sincronización de sesión");
 						alert("errror de sincronización de sesión. SesionId: " + session.id);
 					}
 				);
 			}
+			hadError = false;
 		});
 	};
 

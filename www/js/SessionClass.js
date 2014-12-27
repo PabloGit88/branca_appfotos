@@ -16,6 +16,7 @@ var Session = (function () {
 		isSync : isSync,
 		date : date, 
 		id: id,
+		hasToSync : 0,
 	 }
   }
 })();
