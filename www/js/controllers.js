@@ -1,6 +1,6 @@
 angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfotos', 'db.services', 'validation.services', 'popup.services', 'sync.services'])
 
-.controller('PicturePersonsController', function($scope , AppContext , $location, mySqlDbService) {
+.controller('PicturePersonsController', function($scope , AppContext , $location, mySqlDbService, validatorService, popupService) {
 	var emptyPerson = {
 		firstname: '',
 		lastname: '',
@@ -29,25 +29,34 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		}
 	};
 	
-	$scope.savePersonList = function( ) 
+	$scope.savePersonList = function( event )
 	{
-		var recipientsList = "";
-		angular.forEach($scope.persons, function(person, key) {
-			//AppContext.savePerson(person);
-			recipientsList = recipientsList + person.firstname + ';'+ person.lastname + ';'+ person.email  + ',';
-		
-		});
-		var db =  AppContext.getDbConnection();
-		var imageUri = AppContext.getImageUri();
-		var sesssionId = AppContext.getSessionId();
-		console.log("Saving Photo : " + imageUri +  " -  " + sesssionId +  "  - " +  recipientsList);
-		mySqlDbService.savePhoto(db , imageUri , sesssionId, recipientsList , 0);
-		AppContext.incrementCurrentSessionPhotos();
-		$location.path('/session/picture/take');  
+        event.preventDefault();
+	    if(validatorService.validatePersonsList($scope.persons))
+	    {
+            var recipientsList = "";
+            angular.forEach($scope.persons, function(person, key) {
+                //AppContext.savePerson(person);
+                recipientsList = recipientsList + person.firstname + ';'+ person.lastname + ';'+ person.email  + ',';
+
+            });
+            var db =  AppContext.getDbConnection();
+            var imageUri = AppContext.getImageUri();
+            var sesssionId = AppContext.getSessionId();
+            console.log("Saving Photo : " + imageUri +  " -  " + sesssionId +  "  - " +  recipientsList);
+
+            mySqlDbService.savePhoto(db , imageUri , sesssionId, recipientsList , 0);
+            AppContext.incrementCurrentSessionPhotos();
+
+            $location.path('/session/picture/take');
+        }else
+        {
+            popupService.openFormErrorPopup();
+        }
 	}
 	
 })
-.controller('SessionsListController', function($scope, AppContext, mySqlDbService, syncService) {
+.controller('SessionsListController', function($scope, AppContext, mySqlDbService, syncService, popupService) {
 	
 	$scope.sessions = [];
 	$scope.init = function (){
@@ -147,6 +156,8 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 			}
 			hadError = false;
 		});
+
+		popupService.openSyncSuccessPopup();
 	};
 
 })
@@ -182,15 +193,15 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		 $location.path('/');  
 	 };
 })
-.controller('NewSessionController', function($scope, AppContext,$location, mySqlDbService, sessionValidator, popupService) {
+.controller('NewSessionController', function($scope, AppContext,$location, mySqlDbService, validatorService, popupService) {
 	///session/picture/take 
 	$scope.session = Session();
 	
 	$scope.saveSession = function(e) 
 	{
 		event.preventDefault();
-		if (sessionValidator.validate($scope.session)) 
-		{	
+		if (validatorService.validateSession($scope.session))
+		{
 			mySqlDbService.saveSession(AppContext.getDbConnection(), $scope.session ).then(function(res) {
 				console.log("NewSessionController idSession: " +  res.insertId);
 				AppContext.saveSessionId( res.insertId); 

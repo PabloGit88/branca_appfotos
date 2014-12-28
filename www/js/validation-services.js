@@ -1,9 +1,9 @@
 angular.module('validation.services', [])
 
-.factory('sessionValidator', function() 
+.factory('validatorService', function()
 {
 	return {
-		validate: function(session)
+		validateSession: function(session)
 		{
 			if(
 				session.operatorFirstName != undefined && session.operatorFirstName.trim() != '' &&
@@ -21,6 +21,25 @@ angular.module('validation.services', [])
 			{
 				return false;
 			}
-		}
+		},
+		validatePersonsList: function(personsList)
+        {
+            var isValid = true;
+
+            angular.forEach(personsList, function(person, key)
+            {
+                if(
+                   person.firstname != undefined && person.firstname.trim() != '' &&
+                   person.lastname != undefined && person.lastname.trim() != '' &&
+                   person.email != undefined && person.email.trim() != ''
+                )
+                {}else
+                {
+                   isValid = false;
+                }
+            });
+
+            return isValid;
+        }
 	};
 });
