@@ -125,7 +125,7 @@ button {
 
 .bottomButton {
 	position: absolute;
-	bottom: 10%;
+	bottom: 6%;
 }	
 
 .form-group label {
@@ -219,4 +219,10 @@ button {
 
 .sessionsList .actions {
 	margin: 0;
+}
+
+.sessionsList .syncProgress {
+	margin-bottom: 20px;
+	text-align: center;
+	display: none;
 }

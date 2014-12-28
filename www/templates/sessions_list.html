@@ -21,8 +21,17 @@
   </ion-content>
 	<div class="row actions bottomButton">
 		<div class="col-xs-12 centerContent">
-			<a href="#/" nav-direction="back" class="btn btn-default pull-left">VOLVER &lt;</a>
-			<a href="#" nav-direction="back" ng-click="syncSessions();" class="btn btn-default pull-right">SINCRONIZAR &gt;</a>
+		<div class="row">
+			<div class="col-xs-12 syncProgress">
+				<span>Sincronizando: 0%</span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-12">
+				<a href="#/" nav-direction="back" class="btn btn-default pull-left">VOLVER &lt;</a>
+				<a href="#" nav-direction="back" ng-click="syncSessions();" class="btn btn-default pull-right">SINCRONIZAR &gt;</a>
+			</div>
+		</div>
 		</div>
 	</div>
 </ion-view>

@@ -86,6 +86,7 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
         PersonStringList: '',
         DbConnection : '',
         SessionId : '',
+        currentSessionPhotos : 0,
         SaveSessionUrl : "http://www.odiseo.com.ar/projects/brancaAppPhotos/guardar-sesion.php",
     };
 
@@ -122,10 +123,18 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
         getSessionId : function(){
         	return data.SessionId;
         },
-        
+        incrementCurrentSessionPhotos : function()
+        {
+        	data.currentSessionPhotos++;
+        },
+        getCurrentSessionPhotos : function()
+        {
+        	return data.currentSessionPhotos;
+        },
         closeSession : function(){
         	data.ImageUri = '';
         	data.SessionId = '';
+        	data.currentSessionPhotos = 0;
         },
         getSaveSessionUrl : function (){
         	return data.SaveSessionUrl;

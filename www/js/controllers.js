@@ -22,6 +22,10 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 			}); 
 		}else {
 			$scope.persons.splice($index+1, 1);
+			if($index == $scope.persons.length-1)
+			{				
+				$event.toElement.src = "img/addRowButton.png";
+			}
 		}
 	};
 	
@@ -38,6 +42,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		var sesssionId = AppContext.getSessionId();
 		console.log("Saving Photo : " + imageUri +  " -  " + sesssionId +  "  - " +  recipientsList);
 		mySqlDbService.savePhoto(db , imageUri , sesssionId, recipientsList , 0);
+		AppContext.incrementCurrentSessionPhotos();
 		$location.path('/session/picture/take');  
 	}
 	
@@ -75,12 +80,14 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	{
 		var db = AppContext.getDbConnection();
 		mySqlDbService.updatePhotoAsSynchronized(db, imageId , 1);
+		$('.syncProgress ').hide();
 	};
 	
 	var hadError = false;
 	var error   = function(session, imageUri , imageId, recipients){
 		 hadError = true;
 		console.log("ocurrio un error");
+		$('.syncProgress ').hide();
 	};
 	
 	
@@ -108,12 +115,12 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 					if (data.error == false ){
 							mySqlDbService.findPhotosForSession(db,session.id).then(function(res) {
 								 for (var i=0; i< res.rows.length; i++){
-										var item = res.rows.item(i); 
-										console.log(item);
-										var imageUri = item.uri_photo;
-										var recipients = item.recipients;
-										var imageId = item.id_photo;
-										syncService.uploadPhoto(session, imageUri , imageId, recipients, success, error );
+										var photo = res.rows.item(i); 
+										console.log(photo);
+										var imageUri = photo.uri_photo;
+										var recipients = photo.recipients;
+										var imageId = photo.id_photo;
+										syncService.uploadPhoto(session, imageUri , imageId, recipients, success, error, i);
 								 }
 								 if ( !hadError){
 									 console.log("fotos subidas correctamente sincronizando.");
@@ -143,7 +150,9 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	};
 
 })
-.controller('TakePhotoController', function($scope, camService, AppContext,$location) {
+.controller('TakePhotoController', function($scope, camService, AppContext,$location) 
+{
+	$scope.currentSessionPhotos = AppContext.getCurrentSessionPhotos();
 	 $scope.takePhoto = function() {
 	      var options = {
 		  quality: 75,

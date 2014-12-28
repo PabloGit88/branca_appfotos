@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<widget id="com.ionicframework.myapp331433" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-  <name>myApp</name>
+<widget id="com.odiseo.branca_app_photos" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+  <name>Branca Fotos</name>
   <description>
-        An Ionic Framework and Cordova project.
+        Branca App Fotos
     </description>
-  <author email="hi@ionicframework" href="http://ionicframework.com/">
-      Ionic Framework Team
+  <author email="odiseo.team@gmail.com" href="http://odiseo.com.ar">
+      Odiseo Team
     </author>
   <content src="index.html"/>
   <access origin="*"/>

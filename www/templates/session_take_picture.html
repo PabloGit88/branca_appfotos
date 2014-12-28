@@ -1,6 +1,6 @@
 <ion-view view-title="Sacar foto" class="home">
   <ion-content>
-	<h3>Fotos tomadas en la sesión actual: </h3>
+	<h3>Fotos tomadas en la sesión actual: {{ currentSessionPhotos }}</h3>
     <ul>
 		<li><a href="#" ng-click="takePhoto();" nav-direction="forward"><img src="img/takePictureButton.png" class="img-responsive"></a></li>
 		<li><a href="#/" ng-click="closeSession();" nav-direction="swap"><img src="img/closeSessionButton.png" class="img-responsive"></a></li>
