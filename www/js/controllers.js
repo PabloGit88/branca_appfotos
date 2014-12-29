@@ -178,6 +178,8 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		camService.getPicture(options).then(
 		function(imageURI) {
 		  	AppContext.setImageUri(imageURI);
+		  	AppContext.incrementCurrentSessionPhotos();
+		  	$scope.currentSessionPhotos =  AppContext.getCurrentSessionPhotos();
 		  	console.log("redirecting to: /session/picture/persons" );
 		    $location.path('/session/picture/persons');  
 		},
