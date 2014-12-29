@@ -22,7 +22,8 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
       StatusBar.styleDefault();
     }
     
-    db = mySqlDbService.openOrCreateDb('photo_email_branca.db');
+   AppContext.setDeviceUUID(device.uuid);
+   db = mySqlDbService.openOrCreateDb('photo_email_branca.db');
 	
     var sessionTableData = "id integer primary key ,name varchar(20) NOT NULL, last_name varchar(20) NOT NULL, place varchar(20) NOT NULL,  state varchar(20) NOT NULL,  city varchar(20) NOT NULL,  date date NOT NULL,  isSync integer";
 	mySqlDbService.createTableIfNotExist(db, "sessions" ,sessionTableData );
@@ -88,6 +89,7 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
         SessionId : '',
         currentSessionPhotos : 0,
         SaveSessionUrl : "http://www.odiseo.com.ar/projects/brancaAppPhotos/guardar-sesion.php",
+        DeviceUUID: 0,
     };
 
     return {
@@ -140,6 +142,12 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
         	return data.SaveSessionUrl;
         },
         
-        
+        setDeviceUUID : function( deviceUUID){
+        	
+        	data.DeviceUUID = deviceUUID; 
+        },
+        getDeviceUUID : function(){
+        	return data.DeviceUUID;
+        },
     };
 });
