@@ -102,6 +102,13 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	
 	$scope.syncSessions = function() {
 		// /
+		
+		if (  navigator.connection.type == Connection.NONE)
+			{
+				alert("Necesita conexión a internet para poder sincronizar.");
+				return;
+			}
+		
 		var db = AppContext.getDbConnection();
 		var saveSessionUrl = AppContext.getSaveSessionUrl();
 		
