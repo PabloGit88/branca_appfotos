@@ -212,8 +212,10 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 {
 	$scope.init = function () {
 		console.log("init: " + AppContext.getCurrentSessionPhotos());
-		 $scope.currentSessionPhotos = AppContext.getCurrentSessionPhotos();
-		};
+		 $scope.currentSessionPhotos = 0;
+	};
+	
+	$scope.init();
 	
 	 $scope.takePhoto = function() {
 	      var options = {
@@ -229,6 +231,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		camService.getPicture(options).then(
 		function(imageURI) {
 		  	AppContext.setImageUri(imageURI);
+		  	$scope.currentSessionPhotos++;
 		    $location.path('/session/picture/persons');  
 		},
 		function(err) {
