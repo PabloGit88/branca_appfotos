@@ -9,7 +9,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	
 	
 	$scope.persons = [emptyPerson];
-
+	
 	$scope.addPerson = function($event, $index) 
 	{ 
 		if($index == $scope.persons.length-1)
@@ -32,13 +32,13 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	$scope.savePersonList = function( event )
 	{
         event.preventDefault();
-	    if(validatorService.validatePersonsList($scope.persons))
+	    if(true)
 	    {
 			popupService.closePopup();
             var recipientsList = "";
             angular.forEach($scope.persons, function(person, key) {
                 //AppContext.savePerson(person);
-                recipientsList = recipientsList + person.firstname + ';'+ person.lastname + ';'+ person.email  + ',';
+                recipientsList = recipientsList + person.firstname + ','+ person.lastname + ','+ person.email  + ';';
 
             });
             var db =  AppContext.getDbConnection();
@@ -48,6 +48,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 
             mySqlDbService.savePhoto(db , imageUri , sesssionId, recipientsList , 0);
             AppContext.incrementCurrentSessionPhotos();
+            console.log(AppContext.getCurrentSessionPhotos());
 
             $location.path('/session/picture/take');
         }else
@@ -76,7 +77,8 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
             	sessionObject.date = item.date;
             	sessionObject.id = item.id;
 				sessionObject.uuid = item.uuid;
-            	sessionObject.isSync = item.isSync;
+				sessionObject.isSync = item.isSync;
+            	sessionObject.isSent = item.isSent;
             	console.log("Session Object: " + sessionObject);
             	$scope.sessions.push(sessionObject);
             }
@@ -87,86 +89,120 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	};
 	$scope.init();
 	
+	var updateSessionSyncronization= function(session, isSync){
+		 console.log("fotos subidas correctamente sincronizando.");
+		 mySqlDbService.updateSessionSyncronization(db, session.id, isSync).then(
+				 function(res){
+					session.isSync = 1;
+					session.hasToSync = 0;
+				 },
+				 function(err){
+					 console.log(err);
+				 });
+	}
 	
-	var success  =  function(session, imageUri , imageId, recipients)
+	
+	var uploadPhotosSuccess  =  function(session, imageUri , imageId, recipients, quantityToSend , sentOk)
 	{
+		sentOk.quantity++;
 		var db = AppContext.getDbConnection();
-		mySqlDbService.updatePhotoAsSynchronized(db, imageId , 1);
-		$('.syncProgress ').hide();
+		mySqlDbService.updatePhotoAsSynchronized(db, imageId , 1).then(
+			function(res) { 
+				$('.syncProgress ').hide();
+			
+			},
+			function(err){
+				console.error(err);
+			}
+		);
+		if (sentOk.quantity == quantityToSend){
+			updateSessionSyncronization(session, 1);
+		}
 	};
 	
-	var hadError = false;
-	var error   = function(session, imageUri , imageId, recipients){
-		 hadError = true;
+	var uploadPhotosError  = function(){
 		console.log("ocurrio un error");
 		$('.syncProgress ').hide();
+		alert("Ocurrio un error en la sincronización de una de las fotos.");
+		session.isSync = 0 ;
+		//hubo un error al subir una foto, entonces la sesión todavia se puede sincronizar.
+		updateSessionSyncronization(session, 0);
 	};
 	
+	var sendPhotos = function( session){
+		//object in order to pass by reference.
+		var sentOk = { quantity : 0 };
+		mySqlDbService.findPhotosForSession(db,session.id).then(function(res) {
+			 for (var i=0; i< res.rows.length; i++){
+				 	var photo = res.rows.item(i); 
+					console.log(photo);
+					var imageUri = photo.uri_photo;
+					var recipients = photo.recipients;
+					var imageId = photo.id_photo;
+					syncService.uploadPhoto(session, imageUri , imageId, recipients, uploadPhotosSuccess(session,imageUri,imageId, recipients, res.rows.length ,sentOk), uploadPhotosError, i);
+			 }
+		}, function (err) {
+            console.error(err);
+        });
+	};
+	
+	
+	var dataRequestMapper = function(session){
+		return {
+				"deviceId" : AppContext.getDeviceUUID(),
+				"sessionId" : session.id,
+				"operatorFirstName" : session.operatorFirstName,
+				"operatorLastName" : session.operatorLastName,
+				"place" : session.place,
+				"state" : session.state,
+				"city" : session.city,
+				"date" : session.date,	
+			};
+	}
 	
 	$scope.syncSessions = function() {
 		// /
 		
 		if (  navigator.connection.type == Connection.NONE)
 			{
-				popupService.openErrorConnectionPopup();
+				alert("Necesita conexión a internet para poder sincronizar.");
 				return;
 			}
 		
 		var db = AppContext.getDbConnection();
 		var saveSessionUrl = AppContext.getSaveSessionUrl();
-		
-		angular.forEach($scope.sessions, function(session, key) 
-		{
-			var dataReq = {
-				"id" : session.uuid,
-				"nombre_operario" : session.operatorFirstName,
-				"apellido_operario" : session.operatorLastName,
-				"lugar" : session.place,
-				"provincia" : session.state,
-				"ciudad" : session.city,
-				"fecha" : session.date,	
-			};
-			if (session.isSync == false && session.hasToSync)
-			{
-				syncService.saveSession(saveSessionUrl, dataReq).success(function(data,status, headers,config ){
-					//TODO : Validar que la sesión no se guarde multiples veces. 
-					console.log("data post save session:");
-					console.log(data);
-					if (data.error == false ){
-							mySqlDbService.findPhotosForSession(db,session.id).then(function(res) {
-								 for (var i=0; i< res.rows.length; i++){
-										var photo = res.rows.item(i); 
-										console.log(photo);
-										var imageUri = photo.uri_photo;
-										var recipients = photo.recipients;
-										var imageId = photo.uuid;
-										syncService.uploadPhoto(session, imageUri , imageId, recipients, success, error, i);
-								 }
-								 if ( !hadError){
-									 console.log("fotos subidas correctamente sincronizando.");
-									 mySqlDbService.updateSessionAsSynchronized(db, session.id, 1).then(
-											 function(res){
-												session.isSync = 1;
-												session.hasToSync = 0;
+
+		angular.forEach($scope.sessions, function(session, key) {
+			var dataReq = dataRequestMapper(session);
+				if (session.hasToSync){
+					if ( session.isSent == 0 )
+					{	
+						syncService.saveSession(saveSessionUrl, dataReq).success(function(data,status, headers,config ){
+							console.log("data post save session: " + data);
+							if (data.error == false ){
+								mySqlDbService.updateSessionSending(db, session.id, 1).then(
+										 function(res){
+												session.isSent = 1;
+												sendPhotos(session);
 											 },
 											 function(err){
 												 console.log(err);
 											 });
-								 }
-							}, function (err) {
-					            console.error(err);
-					        });
-					}//else -> hubo error... analizar que hacer.
-				}).error(
-					function(e){
-						console.log(e);
-						console.log("error de sincronización de sesión");
-						alert("errror de sincronización de sesión. SesionId: " + session.id);
+							}//else -> hubo error... analizar que hacer.
+						}).error(
+							function(e){
+								console.log(e);
+								console.log("error de sincronización de sesión");
+								alert("errror de sincronización de sesión. SesionId: " + session.id);
+							}
+						);
 					}
-				);
+					else {
+						sendPhotos(session);
+					}
+				}
 			}
-			hadError = false;
-		});
+		);
 
 		popupService.openSyncSuccessPopup();
 	};
@@ -174,7 +210,11 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 })
 .controller('TakePhotoController', function($scope, camService, AppContext,$location) 
 {
-	$scope.currentSessionPhotos = AppContext.getCurrentSessionPhotos();
+	$scope.init = function () {
+		console.log("init: " + AppContext.getCurrentSessionPhotos());
+		 $scope.currentSessionPhotos = AppContext.getCurrentSessionPhotos();
+		};
+	
 	 $scope.takePhoto = function() {
 	      var options = {
 		  quality: 100,
@@ -189,14 +229,11 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		camService.getPicture(options).then(
 		function(imageURI) {
 		  	AppContext.setImageUri(imageURI);
-		  	AppContext.incrementCurrentSessionPhotos();
-		  	$scope.currentSessionPhotos =  AppContext.getCurrentSessionPhotos();
-		  	console.log("redirecting to: /session/picture/persons" );
 		    $location.path('/session/picture/persons');  
 		},
 		function(err) {
 		   alert("Por favor, intente nuevamente.");
-		}
+			}
 		);
 	};
 	
@@ -205,6 +242,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		 AppContext.closeSession();
 		 $location.path('/');  
 	 };
+	 
 })
 .controller('NewSessionController', function($scope, AppContext,$location, mySqlDbService, validatorService, popupService) {
 	///session/picture/take 

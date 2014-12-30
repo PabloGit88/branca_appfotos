@@ -1,7 +1,7 @@
 var Session = (function () {
 	
   	//Immediately returns an anonymous function which builds our modules 
-  	return function (operatorFirstName, operatorLastName, place,  city , state, day, month, year, isSync,date, id, uuid) {        
+  	return function (operatorFirstName, operatorLastName, place,  city , state, day, month, year, isSync,date, id, uuid, isSent) {        
         
        console.log("Create Session called with " + operatorFirstName + "...");
 	   return {
@@ -18,6 +18,7 @@ var Session = (function () {
 		id: id,
 		uuid: uuid,
 		hasToSync : 0,
+		isSent : isSent,
 	 }
   }
 })();
