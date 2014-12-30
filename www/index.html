@@ -9,6 +9,7 @@
 	<link href="lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link href="css/webfonts.css" rel="stylesheet">
     <link href="css/main.css" rel="stylesheet">
+	<link href="css/media_querys.css" rel="stylesheet">
 
     <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
     <link href="css/ionic.app.css" rel="stylesheet">
@@ -54,7 +55,7 @@
 				<img src="img/syncSuccessMessage.png" class="img-responsive message syncSuccess" style="display:none;">
 				<img src="img/formErrorMessage.png" class="img-responsive message formError">
 			 	<div class="actions bottomButton">
-					<a href="#" class="acceptButton" style="display: none;"><img src="img/acceptPopupButton.png" class="img-responsive"></a>
+					<a href="#" class="acceptButton" ng-click="savePersonList($event)" style="display: none;"><img src="img/acceptPopupButton.png" class="img-responsive"></a>
 					<a href="#" class="cancelButton" style="display: none;" data-dismiss="modal"><img src="img/cancelPopupButton.png" class="img-responsive"></a>
 					<a href="#" class="finalizeButton" style="display: none;" data-dismiss="modal"><img src="img/finalizePopupButton.png" class="img-responsive"></a>
 					<a href="#" class="acceptDismissButton" data-dismiss="modal"><img src="img/acceptPopupButton.png" class="img-responsive"></a>

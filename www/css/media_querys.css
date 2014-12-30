@@ -1,0 +1,27 @@
+@media only screen and (max-width: 360px) 
+{
+	
+.form-group label {
+	font-size: 12px;
+	line-height: 12px;
+}
+
+.form-group input[type="text"], .form-group input[type="email"] {
+	height: 24px;
+}
+
+.sessionsList h4 {
+	font-size: 18px;
+}
+
+.sessionsList table tr th {
+	font-size: 10px;
+}
+
+.sessionsList table tr th, .sessionsList table tr td {
+	border: 1px solid #FFFFFF;
+}
+
+.sessionsList .actions a {
+	font-size: 10px;
+}

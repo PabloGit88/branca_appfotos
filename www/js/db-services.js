@@ -7,6 +7,15 @@ angular.module('db.services', ['ngCordova'])
 		 db = $cordovaSQLite.openDB(dbName);
 		 return db;
 	},
+	generateUuid: function()
+	{
+		function S4() {
+		    return (((1+Math.random())*0x10000)|0).toString(16).substring(1); 
+		}
+
+		// then to call it, plus stitch in '4' in the third group
+		return (S4() + S4() + "-" + S4() + "-4" + S4().substr(0,3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
+	},
 	createTableIfNotExist: function( db , tableName , tableData){
 	   // example: CREATE TABLE IF NOT EXISTS people (id integer primary key, firstname text, lastname text)
 	   $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS "  + tableName +  " ( " +  tableData  + " )" );
@@ -14,13 +23,18 @@ angular.module('db.services', ['ngCordova'])
 	
 	saveSession : function(db, session){
 		var date = session.day + "/" + session.month + "/" + session.year;
-		var statement = "INSERT INTO sessions(name, last_name, place, state, city, date ,isSync ) VALUES ( ?,?,?,?,?,?,?)";
-		return  $cordovaSQLite.execute(db,statement , [session.operatorFirstName, session.operatorLastName, session.place, session.state, session.city, date , 0 ]);
+		var uuid = this.generateUuid();
+		console.log("Session uuid generated: "+uuid);
+		var statement = "INSERT INTO sessions(uuid, name, last_name, place, state, city, date ,isSync ) VALUES (?,?,?,?,?,?,?,?)";
+		return  $cordovaSQLite.execute(db,statement , [uuid, session.operatorFirstName, session.operatorLastName, session.place, session.state, session.city, date , 0 ]);
 	},
 	
-	savePhoto : function(db , imageUri , sesssionId, recipients , isSync ){
-		var statement = "INSERT INTO session_photo( uri_photo, id_session, recipients, isSync ) VALUES ( ?,?,?,?)";
-		$cordovaSQLite.execute(db,statement , [imageUri, sesssionId, recipients, isSync ]).then(function(res) {
+	savePhoto : function(db , imageUri , sesssionId, recipients , isSync )
+	{
+		var uuid = this.generateUuid();
+		console.log("Photo uuid generated: "+uuid);
+		var statement = "INSERT INTO session_photo(uuid, uri_photo, id_session, recipients, isSync ) VALUES (?,?,?,?,?)";
+		$cordovaSQLite.execute(db,statement , [uuid, imageUri, sesssionId, recipients, isSync ]).then(function(res) {
             console.log("INSERT ID -> " + res.insertId);
         }, function (err) {
             console.error(err);

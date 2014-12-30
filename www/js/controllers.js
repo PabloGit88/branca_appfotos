@@ -1,6 +1,6 @@
 angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfotos', 'db.services', 'validation.services', 'popup.services', 'sync.services'])
 
-.controller('PicturePersonsController', function($scope , AppContext , $location, mySqlDbService, validatorService, popupService) {
+.controller('PicturePersonsController', function($scope, $rootScope, AppContext , $location, mySqlDbService, validatorService, popupService) {
 	var emptyPerson = {
 		firstname: '',
 		lastname: '',
@@ -9,7 +9,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	
 	
 	$scope.persons = [emptyPerson];
-	
+
 	$scope.addPerson = function($event, $index) 
 	{ 
 		if($index == $scope.persons.length-1)
@@ -34,6 +34,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
         event.preventDefault();
 	    if(validatorService.validatePersonsList($scope.persons))
 	    {
+			popupService.closePopup();
             var recipientsList = "";
             angular.forEach($scope.persons, function(person, key) {
                 //AppContext.savePerson(person);
@@ -55,6 +56,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
         }
 	}
 	
+	$rootScope.savePersonList = $scope.savePersonList;
 })
 .controller('SessionsListController', function($scope, AppContext, mySqlDbService, syncService, popupService) {
 	
@@ -73,6 +75,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
             	sessionObject.state =  item.state;
             	sessionObject.date = item.date;
             	sessionObject.id = item.id;
+				sessionObject.uuid = item.uuid;
             	sessionObject.isSync = item.isSync;
             	console.log("Session Object: " + sessionObject);
             	$scope.sessions.push(sessionObject);
@@ -105,25 +108,26 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		
 		if (  navigator.connection.type == Connection.NONE)
 			{
-				alert("Necesita conexión a internet para poder sincronizar.");
+				popupService.openErrorConnectionPopup();
 				return;
 			}
 		
 		var db = AppContext.getDbConnection();
 		var saveSessionUrl = AppContext.getSaveSessionUrl();
 		
-		angular.forEach($scope.sessions, function(session, key) {
+		angular.forEach($scope.sessions, function(session, key) 
+		{
 			var dataReq = {
-				"deviceId" : 654654564,
-				"sessionId" : session.id,
-				"operatorFirstName" : session.operatorFirstName,
-				"operatorLastName" : session.operatorLastName,
-				"place" : session.place,
-				"state" : session.state,
-				"city" : session.city,
-				"date" : session.date,	
+				"id" : session.uuid,
+				"nombre_operario" : session.operatorFirstName,
+				"apellido_operario" : session.operatorLastName,
+				"lugar" : session.place,
+				"provincia" : session.state,
+				"ciudad" : session.city,
+				"fecha" : session.date,	
 			};
-			if (session.isSync == false && session.hasToSync){
+			if (session.isSync == false && session.hasToSync)
+			{
 				syncService.saveSession(saveSessionUrl, dataReq).success(function(data,status, headers,config ){
 					//TODO : Validar que la sesión no se guarde multiples veces. 
 					console.log("data post save session:");
@@ -135,7 +139,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 										console.log(photo);
 										var imageUri = photo.uri_photo;
 										var recipients = photo.recipients;
-										var imageId = photo.id_photo;
+										var imageId = photo.uuid;
 										syncService.uploadPhoto(session, imageUri , imageId, recipients, success, error, i);
 								 }
 								 if ( !hadError){
@@ -173,9 +177,9 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	$scope.currentSessionPhotos = AppContext.getCurrentSessionPhotos();
 	 $scope.takePhoto = function() {
 	      var options = {
-		  quality: 75,
-		  targetWidth: 320,
-		  targetHeight: 320,
+		  quality: 100,
+		  targetWidth: 600,
+		  targetHeight: 1024,
 		  saveToPhotoAlbum: true,
 		  destinationType: Camera.DestinationType.FILE_URI,
 		  encodingType: Camera.EncodingType.JPEG,

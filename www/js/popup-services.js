@@ -43,6 +43,10 @@ angular.module('popup.services', [])
 			$('#basicPopup .actions a.finalizeButton').show();
 			
 			$('#basicPopup').modal('show');
+		},
+		closePopup: function()
+		{
+			$('#basicPopup').modal('hide');
 		}
 	};
 });

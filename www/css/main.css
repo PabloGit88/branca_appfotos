@@ -125,8 +125,14 @@ button {
 
 .bottomButton {
 	position: absolute;
-	bottom: 6%;
+	top: 410px;
 }	
+
+.modal .bottomButton,
+.sessionsList .bottomButton {
+	bottom: 6%;
+	top: auto;
+}
 
 .form-group label {
 	font-family: 'open_sansregular';
@@ -137,6 +143,7 @@ button {
 }
 
 .form-group input[type="text"],
+.form-group input[type="number"],
 .form-group input[type="email"] {
 	height: 43px;
 	padding: 6px 18px;
