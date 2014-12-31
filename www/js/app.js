@@ -97,6 +97,7 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
         currentSessionPhotos : 0,
         SaveSessionUrl : "http://www.odiseo.com.ar/projects/brancaAppPhotos/guardar-sesion.php", //"http://test3.bblabs.com.ar/playup_fotos_2015/web/api/guardar-sesion",
         DeviceUUID: 0,
+        processing : true,
     };
 
     return {
@@ -156,5 +157,6 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
         getDeviceUUID : function(){
         	return data.DeviceUUID;
         },
+        
     };
 });

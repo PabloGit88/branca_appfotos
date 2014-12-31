@@ -280,18 +280,20 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	};
 	
 	$scope.syncSessionsAsync = function() {
+		
 		if (  navigator.connection.type == Connection.NONE)
-			{
-				alert("Necesita conexión a internet para poder sincronizar.");
-				return;
-			}
+		{
+			alert("Necesita conexión a internet para poder sincronizar.");
+			return;
+		}
+		
 		var syncResult = { errorPhotoSyncronization : false,
 					       errorSessionSyncronization : false,
 						 };
 		var db = AppContext.getDbConnection();
 		var saveSessionUrl = AppContext.getSaveSessionUrl();
 		var keepFor = true;
-		for (int i = 0 ; i < $scope.sessions.length && keepFor == true ; i++ )
+		for ( i = 0 ; i < $scope.sessions.length && keepFor == true ; i++ )
 		{
 			session = $scope.sessions[i];
 			var dataReq = dataRequestMapper(session);
@@ -329,7 +331,6 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 					}
 				}
 			}
-		);
 		if (syncResult.errorPhotoSyncronization == false &&  syncResult.errorPhotoSyncronization == false){
 			popupService.openSyncSuccessPopup();
 		}
@@ -363,6 +364,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		    $location.path('/session/picture/persons');  
 		},
 		function(err) {
+		   console.log(err);
 		   alert("Por favor, intente nuevamente.");
 			}
 		);

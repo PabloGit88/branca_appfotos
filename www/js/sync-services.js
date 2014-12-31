@@ -95,6 +95,8 @@ angular.module('sync.services', ['ngCordova'])
     		var returnData = { error : false, res : {} };
     		var hasExecuted = false;
     		while(processing){	
+    			console.log("saveSessionAsync");
+    			console.log("saveSessionAsync");
     			if (hasExecuted == false)
     			{	
     				hasExecuted = true;
@@ -107,6 +109,7 @@ angular.module('sync.services', ['ngCordova'])
 			    	$http(req).success(
 				    			function(data,status, headers,config )
 				    			{
+				    				console.log("succes");
 				    				processing = false;
 				    			}
 			    			).error(
@@ -114,6 +117,7 @@ angular.module('sync.services', ['ngCordova'])
 				    			{
 				    				returnData.error = true;
 				    				processing = false;
+				    				console.log("error");
 				    			}
 			    			);
     			}

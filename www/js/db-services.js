@@ -25,8 +25,8 @@ angular.module('db.services', ['ngCordova'])
 		var date = session.day + "/" + session.month + "/" + session.year;
 		var uuid = this.generateUuid();
 		console.log("Session uuid generated: "+uuid);
-		var statement = "INSERT INTO sessions(uuid, name, last_name, place, state, city, date ,isSync ) VALUES (?,?,?,?,?,?,?,?)";
-		return  $cordovaSQLite.execute(db,statement , [uuid, session.operatorFirstName, session.operatorLastName, session.place, session.state, session.city, date , 0 ]);
+		var statement = "INSERT INTO sessions(uuid, name, last_name, place, state, city, date ,isSync , isSent) VALUES (?,?,?,?,?,?,?,?)";
+		return  $cordovaSQLite.execute(db,statement , [uuid, session.operatorFirstName, session.operatorLastName, session.place, session.state, session.city, date , 0 , 0 ]);
 	},
 	
 	savePhoto : function(db , imageUri , sesssionId, recipients , isSync )
