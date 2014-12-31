@@ -50,18 +50,119 @@ angular.module('db.services', ['ngCordova'])
 		var statement = "SELECT id_photo, uuid, uri_photo, id_session,recipients,  isSync	FROM session_photo where id_session = ? and isSync = ?";
 		return $cordovaSQLite.execute(db,statement , [sessionId, 0]);
 	},
-	updatePhotoAsSynchronized : function(db, idPhoto, isSync){
+	
+	
+	findPhotosForSessionAsync : function( db, sessionId){
+		var statement = "SELECT id_photo, uuid, uri_photo, id_session,recipients,  isSync	FROM session_photo where id_session = ? and isSync = ?";
+		var processing = true; 
+		var returnData = { error : false, res : {} };
+		var hasExecuted = false;
+		while(processing){
+			if (!hasExecuted)
+			{
+				hasExecuted = true;
+				$cordovaSQLite.execute(db,statement , [sessionId, 0]).then(
+					function(res){
+						processing = false;
+						returnData.res = res;
+					},
+					function(err){
+						console.log(err);
+						processing = false;
+						returnData.error = true;
+					}
+			    );
+			}
+		} 
+		return returnData;
+	},
+	
+	updatePhotoSynchronization : function(db, idPhoto, isSync){
 		var statement = "UPDATE session_photo SET isSync = ? where id_photo = ?";
 		return $cordovaSQLite.execute(db,statement , [isSync, idPhoto]);
+	},
+	
+	
+	
+	updatePhotoSynchronizationAsync : function(db, idPhoto, isSync){
+		var statement = "UPDATE session_photo SET isSync = ? where id_photo = ?";
+		var processing = true; 
+		var returnData = { error : false, res : {} };
+		var hasExecuted = false;
+		while(processing){
+			if (!hasExecuted)
+			{
+				hasExecuted = true;
+				$cordovaSQLite.execute(db,statement , [isSync, idPhoto]).then(
+					function(res){
+						processing = false;
+						returnData.res = res;
+					},
+					function(err){
+						console.log(err);
+						processing = false;
+						returnData.error = true;
+					}
+			    );
+			}
+		} 
+		return returnData;
 	},
 	
 	updateSessionSyncronization : function(db, idSession, isSync){
 		var statement = "UPDATE sessions SET isSync = ? where id = ?";
 		return $cordovaSQLite.execute(db,statement , [isSync, idSession]);
 	},
-	updateSessionSending : function (db, idSession, isSent ){
+	
+	updateSessionSyncronizationAsync : function(db, idSession, isSync){
+		var statement = "UPDATE sessions SET isSync = ? where id = ?";
+		var processing = true; 
+		var returnData = { error : false, res : {} };
+		var hasExecuted = false;
+		while(processing){
+			if (!hasExecuted)
+			{
+				hasExecuted = true;
+				$cordovaSQLite.execute(db,statement , [isSync, idSession]).then(
+					function(res){
+						processing = false;
+						returnData.res = res;
+					},
+					function(err){
+						console.log(err);
+						processing = false;
+						returnData.error = true;
+					}
+			    );
+			}
+		} 
+		return returnData;
+	},
+	
+	
+	updateSessionSendingAsync : function (db, idSession, isSent ){
 		var statement = "UPDATE sessions SET isSent = ? where id = ?";
-		return $cordovaSQLite.execute(db,statement , [isSent, idSession]);
+		var processing = true; 
+		var returnData = { error : false, res : {} };
+		var hasExecuted = false;
+		while(processing){
+			if (!hasExecuted)
+			{
+				hasExecuted = true;
+				 $cordovaSQLite.execute(db,statement , [isSent, idSession]).then(
+					function(res){
+						processing = false;
+						returnData.res = res;
+					},
+					function(err){
+						console.log(err);
+						processing = false;
+						returnData.error = true;
+					}
+			    );
+			}
+		} 
+		return returnData;
 	}
  }
 }])

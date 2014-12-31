@@ -106,7 +106,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	{
 		sentOk.quantity++;
 		var db = AppContext.getDbConnection();
-		mySqlDbService.updatePhotoAsSynchronized(db, imageId , 1).then(
+		mySqlDbService.updatePhotoSynchronization(db, imageId , 1).then(
 			function(res) { 
 				$('.syncProgress ').hide();
 			
@@ -133,7 +133,14 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		//object in order to pass by reference.
 		var sentOk = { quantity : 0 };
 		mySqlDbService.findPhotosForSession(db,session.id).then(function(res) {
-			 for (var i=0; i< res.rows.length; i++){
+			if (res.rows.length == 0 ) 
+				{
+					session.isSync = 1;
+					session.hasToSync = 0;
+				}
+			
+			
+			for (var i=0; i< res.rows.length; i++){
 				 	var photo = res.rows.item(i); 
 					console.log(photo);
 					var imageUri = photo.uri_photo;
@@ -144,6 +151,71 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		}, function (err) {
             console.error(err);
         });
+	};
+	
+	var sendAllPhotosSync = function( session){
+		//object in order to pass by reference.
+		var sentOk = { quantity : 0 };
+		var returnData = {error : false };
+		var sqlResult = mySqlDbService.findPhotosForSessionAsync(db,session.id);
+		var sendPhotoResult;
+		if (sqlResult.error = false ){
+			var res = sqlResult.res;
+			for (var i=0; i < res.rows.length; i++)
+			{
+			 	var photo = res.rows.item(i); 
+				console.log(photo);
+				var updateResult = mySqlDbService.updatePhotoSynchronizationAsync(db, imageId , 1);
+				if (updateResult.error == false )
+				{// actualizo db --> entonces envio (para poder cancelar en caso de error luego)
+					sendPhotoResult = sendOnePhotoAsync(session, photo, i);
+					if (sendPhotoResult.error == true){
+						mySqlDbService.updatePhotoSynchronizationAsync(db, imageId , 0);
+						returnData.error = true;
+						return returnData;
+					}
+				}
+				else{
+					returnData.error = true;
+					return returnData;
+				}
+			}
+		}
+		else 
+		{
+			returnData.error = true;
+		}
+		
+		return returnData;
+	};
+	
+	var sendOnePhotoAsync = function (session, photo, photoIndex)
+	{
+		var hasSent = false; 
+		var isSending = true;
+		var returnData = {
+							error : false,
+							error : '',
+						 };
+		while(isSending)
+		{
+			if (!hasSent )
+			{
+				hasSent = true;
+				syncService.uploadPhotoAsync(session, photo,  photoIndex).then(
+						function(e){
+							isSending = false;
+						},
+						function(error){
+							console.log(error);
+							isSending = false;
+							returnData.error = true;
+							returnData.errorMessage = error;
+						}
+				);
+			}
+		}
+		return returnData;
 	};
 	
 	
@@ -158,7 +230,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 				"city" : session.city,
 				"date" : session.date,	
 			};
-	}
+	};
 	
 	$scope.syncSessions = function() {
 		// /
@@ -205,6 +277,62 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		);
 
 		popupService.openSyncSuccessPopup();
+	};
+	
+	$scope.syncSessionsAsync = function() {
+		if (  navigator.connection.type == Connection.NONE)
+			{
+				alert("Necesita conexión a internet para poder sincronizar.");
+				return;
+			}
+		var syncResult = { errorPhotoSyncronization : false,
+					       errorSessionSyncronization : false,
+						 };
+		var db = AppContext.getDbConnection();
+		var saveSessionUrl = AppContext.getSaveSessionUrl();
+		var keepFor = true;
+		for (int i = 0 ; i < $scope.sessions.length && keepFor == true ; i++ )
+		{
+			session = $scope.sessions[i];
+			var dataReq = dataRequestMapper(session);
+				if (session.hasToSync){
+					if ( session.isSent == 0 )
+					{	
+						var saveResult = syncService.saveSessionAsync(saveSessionUrl, dataReq);
+						if (saveResult.error == false)
+						{
+							var updateSessionResult = mySqlDbService.updateSessionSendingAsync(db, session.id, 1);
+							if (updateSessionResult.error == true)
+							{
+								syncResult.errorSessionSyncronization = true;
+							}
+							else{
+								session.isSent = 1;
+							}
+						}
+						else
+						{
+							syncResult.errorSessionSyncronization = true;
+							keepFor = false;
+						}
+					}
+					if (syncResult.errorSessionSyncronization == false){
+						var result  = sendAllPhotosSync(session);
+						if (result.error == true){
+							syncResult.errorPhotoSyncronization = true;
+							keepFor = false;
+						}
+						else{
+							updateSessionSyncronizationAsync(db, session.id, 1);
+							
+						}
+					}
+				}
+			}
+		);
+		if (syncResult.errorPhotoSyncronization == false &&  syncResult.errorPhotoSyncronization == false){
+			popupService.openSyncSuccessPopup();
+		}
 	};
 
 })
