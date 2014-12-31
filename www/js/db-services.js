@@ -47,7 +47,7 @@ angular.module('db.services', ['ngCordova'])
 	},
 	
 	findPhotosForSession : function( db, sessionId){
-		var statement = "SELECT id_photo, uri_photo, id_session,recipients,  isSync	FROM session_photo where id_session = ? and isSync = ?";
+		var statement = "SELECT id_photo, uuid, uri_photo, id_session,recipients,  isSync	FROM session_photo where id_session = ? and isSync = ?";
 		return $cordovaSQLite.execute(db,statement , [sessionId, 0]);
 	},
 	updatePhotoAsSynchronized : function(db, idPhoto, isSync){

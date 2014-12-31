@@ -38,7 +38,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
             var recipientsList = "";
             angular.forEach($scope.persons, function(person, key) {
                 //AppContext.savePerson(person);
-                recipientsList = recipientsList + person.firstname + ';'+ person.lastname + ';'+ person.email  + ',';
+                recipientsList = recipientsList + person.firstname + ','+ person.lastname + ','+ person.email  + ';';
 
             });
             var db =  AppContext.getDbConnection();
@@ -47,7 +47,11 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
             console.log("Saving Photo : " + imageUri +  " -  " + sesssionId +  "  - " +  recipientsList);
 
             mySqlDbService.savePhoto(db , imageUri , sesssionId, recipientsList , 0);
-            AppContext.incrementCurrentSessionPhotos();
+            
+			AppContext.incrementCurrentSessionPhotos();
+			$rootScope.currentSessionPhotos = AppContext.getCurrentSessionPhotos();
+			
+			$scope.persons = [emptyPerson];
 
             $location.path('/session/picture/take');
         }else
@@ -103,9 +107,8 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	};
 	
 	
-	$scope.syncSessions = function() {
-		// /
-		
+	$scope.syncSessions = function() 
+	{
 		if (  navigator.connection.type == Connection.NONE)
 			{
 				popupService.openErrorConnectionPopup();
@@ -172,10 +175,11 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	};
 
 })
-.controller('TakePhotoController', function($scope, camService, AppContext,$location) 
+.controller('TakePhotoController', function($scope, $rootScope, camService, AppContext,$location) 
 {
-	$scope.currentSessionPhotos = AppContext.getCurrentSessionPhotos();
-	 $scope.takePhoto = function() {
+	$rootScope.currentSessionPhotos = AppContext.getCurrentSessionPhotos();
+	
+	$scope.takePhoto = function() {
 	      var options = {
 		  quality: 100,
 		  targetWidth: 600,
@@ -184,26 +188,27 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		  destinationType: Camera.DestinationType.FILE_URI,
 		  encodingType: Camera.EncodingType.JPEG,
 		  sourceType: Camera.PictureSourceType.CAMERA
-		};
+	};
 		
-		camService.getPicture(options).then(
-		function(imageURI) {
-		  	AppContext.setImageUri(imageURI);
-		  	AppContext.incrementCurrentSessionPhotos();
-		  	$scope.currentSessionPhotos =  AppContext.getCurrentSessionPhotos();
-		  	console.log("redirecting to: /session/picture/persons" );
-		    $location.path('/session/picture/persons');  
-		},
-		function(err) {
-		   alert("Por favor, intente nuevamente.");
-		}
+	camService.getPicture(options).then(
+			function(imageURI) {
+		  		AppContext.setImageUri(imageURI);
+		  		console.log("redirecting to: /session/picture/persons" );
+		    	$location.path('/session/picture/persons');  
+			},
+			function(err) {
+		   		alert("Por favor, intente nuevamente.");
+			}
 		);
 	};
 	
-	 $scope.closeSession = function() {
-		 console.log("Session Closed.");
-		 AppContext.closeSession();
-		 $location.path('/');  
+	$scope.closeSession = function() 
+	{
+		console.log("Session Closed.");
+		AppContext.closeSession();
+		$rootScope.currentSessionPhotos = AppContext.getCurrentSessionPhotos();
+		
+		$location.path('/');  
 	 };
 })
 .controller('NewSessionController', function($scope, AppContext,$location, mySqlDbService, validatorService, popupService) {

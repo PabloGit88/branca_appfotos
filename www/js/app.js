@@ -10,7 +10,8 @@ var db = null;
 
 angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.services', 'popup.services'])
 
-.run(function($ionicPlatform, $rootScope, mySqlDbService, AppContext, popupService) {
+.run(function($ionicPlatform, $rootScope, mySqlDbService, AppContext, popupService) 
+{
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -28,9 +29,11 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
 		popupService.openConfirmSavePhotoPopup();
 	};
 	
-   AppContext.setDeviceUUID(device.uuid);
-   db = mySqlDbService.openOrCreateDb('photo_email_branca.db');
-   console.log("conexion: " + Connection.NONE + " -    " + Connection.CELL_3G);
+	$rootScope.currentSessionPhotos = 0;
+	
+	AppContext.setDeviceUUID(device.uuid);
+	db = mySqlDbService.openOrCreateDb('photo_email_branca.db');
+	console.log("conexion: " + Connection.NONE + " -    " + Connection.CELL_3G);
    
     var sessionTableData = "id integer primary key, uuid blob NOT NULL, name varchar(20) NOT NULL, last_name varchar(20) NOT NULL, place varchar(20) NOT NULL,  state varchar(20) NOT NULL,  city varchar(20) NOT NULL,  date date NOT NULL,  isSync integer";
 	mySqlDbService.createTableIfNotExist(db, "sessions" ,sessionTableData );
@@ -39,7 +42,6 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
 	mySqlDbService.createTableIfNotExist(db, "session_photo" ,destinatariesTableData );
 	
 	AppContext.setDbConnection(db);
-    
   });
 })
 
