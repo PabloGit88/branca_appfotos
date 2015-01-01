@@ -68,7 +68,6 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	$scope.init = function (){
 		var db = AppContext.getDbConnection();
 		mySqlDbService.retrieveSessions(db).then(function(res) {
-            console.log("select session result  -> " + res);
             for (var i=0; i< res.rows.length; i++){
             	var sessionObject = Session();
             	var item = res.rows.item(i);
@@ -81,7 +80,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
             	sessionObject.id = item.id;
 				sessionObject.uuid = item.uuid;
             	sessionObject.isSync = item.isSync;
-            	console.log("Session Object: " + sessionObject);
+
             	$scope.sessions.push(sessionObject);
             }
 		
@@ -90,6 +89,21 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
         });
 	};
 	$scope.init();
+
+    $scope.hasSessionToSync = false;
+
+	$scope.$watch("sessions", function(n, o)
+	{
+	    $scope.hasSessionToSync = false;
+
+        angular.forEach(n, function(session, key)
+        {
+            if(!session.isSync && session.hasToSync)
+            {
+                $scope.hasSessionToSync = true;
+            }
+        });
+    }, true );
 	
 	
 	var success  =  function(session, imageUri , imageId, recipients)
@@ -138,7 +152,8 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 					if (data.error == false ){
 							mySqlDbService.findPhotosForSession(db,session.id).then(function(res) {
 								 for (var i=0; i< res.rows.length; i++){
-										var photo = res.rows.item(i); 
+										var photo = res.rows.item(i);
+										console.log("Photo to syncronize...");
 										console.log(photo);
 										var imageUri = photo.uri_photo;
 										var recipients = photo.recipients;
@@ -146,7 +161,6 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 										syncService.uploadPhoto(session, imageUri , imageId, recipients, success, error, i);
 								 }
 								 if ( !hadError){
-									 console.log("fotos subidas correctamente sincronizando.");
 									 mySqlDbService.updateSessionAsSynchronized(db, session.id, 1).then(
 											 function(res){
 												session.isSync = 1;

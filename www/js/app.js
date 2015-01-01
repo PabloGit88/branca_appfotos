@@ -97,7 +97,7 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
         DbConnection : '',
         SessionId : '',
         currentSessionPhotos : 0,
-        SaveSessionUrl : "http://www.odiseo.com.ar/projects/brancaAppPhotos/guardar-sesion.php", //"http://test3.bblabs.com.ar/playup_fotos_2015/web/api/guardar-sesion",
+        SaveSessionUrl : "http://test3.bblabs.com.ar/playup_fotos_2015/web/api/guardar-sesion", //"http://www.odiseo.com.ar/projects/brancaAppPhotos/guardar-sesion.php", 
         DeviceUUID: 0,
     };
 

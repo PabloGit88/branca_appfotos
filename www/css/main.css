@@ -6,7 +6,7 @@ html, body {
 }
 
 body {
-	background: url(../img/app_background.jpg) no-repeat center top;
+	background: url(../img/app_background.jpg) no-repeat center bottom;
 	background-size: cover;
 }
 
