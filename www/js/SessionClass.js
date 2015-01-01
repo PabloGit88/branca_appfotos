@@ -17,6 +17,7 @@ var Session = (function () {
 		id: id,
 		uuid: uuid,
 		hasToSync : 0,
+		isSent : 0
 	 }
   }
 })();

@@ -59,5 +59,10 @@ angular.module('db.services', ['ngCordova'])
 		var statement = "UPDATE sessions SET isSync = ? where id = ?";
 		return $cordovaSQLite.execute(db,statement , [isSync, idSession]);
 	},
+
+	updateSessionAsSent : function(db, idSession, isSent){
+    	var statement = "UPDATE sessions SET isSent = ? where id = ?";
+    	return $cordovaSQLite.execute(db,statement , [isSent, idSession]);
+    },
  }
 }])
