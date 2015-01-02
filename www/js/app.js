@@ -35,10 +35,10 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
 	db = mySqlDbService.openOrCreateDb('photo_email_branca.db');
 	console.log("conexion: " + Connection.NONE + " -    " + Connection.CELL_3G);
    
-    var sessionTableData = "id integer primary key, uuid blob NOT NULL, name varchar(20) NOT NULL, last_name varchar(20) NOT NULL, place varchar(20) NOT NULL,  state varchar(20) NOT NULL,  city varchar(20) NOT NULL,  date date NOT NULL,  isSync integer";
+    var sessionTableData = "id integer primary key, uuid blob NOT NULL, name varchar(20) NOT NULL, last_name varchar(20) NOT NULL, place varchar(20) NOT NULL, state varchar(20) NOT NULL, city varchar(20) NOT NULL, date date NOT NULL, isSync integer, isSent integer NOT NULL DEFAULT 0";
 	mySqlDbService.createTableIfNotExist(db, "sessions" ,sessionTableData );
 	
-	var destinatariesTableData = "id_photo integer primary key, uuid blob NOT NULL, uri_photo varchar(512) NOT NULL, id_session integer,  recipients mediumtext NOT NULL, isSync integer";
+	var destinatariesTableData = "id_photo integer primary key, uuid blob NOT NULL, uri_photo varchar(512) NOT NULL, id_session integer, recipients mediumtext NOT NULL, isSync integer";
 	mySqlDbService.createTableIfNotExist(db, "session_photo" ,destinatariesTableData );
 	
 	AppContext.setDbConnection(db);
@@ -97,7 +97,7 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
         DbConnection : '',
         SessionId : '',
         currentSessionPhotos : 0,
-        SaveSessionUrl : "http://www.odiseo.com.ar/projects/brancaAppPhotos/guardar-sesion.php", //"http://test3.bblabs.com.ar/playup_fotos_2015/web/api/guardar-sesion",
+        SaveSessionUrl : "http://test3.bblabs.com.ar/playup_fotos_2015/web/api/guardar-sesion", //"http://www.odiseo.com.ar/projects/brancaAppPhotos/guardar-sesion.php", 
         DeviceUUID: 0,
     };
 

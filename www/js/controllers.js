@@ -68,7 +68,6 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	$scope.init = function (){
 		var db = AppContext.getDbConnection();
 		mySqlDbService.retrieveSessions(db).then(function(res) {
-            console.log("select session result  -> " + res);
             for (var i=0; i< res.rows.length; i++){
             	var sessionObject = Session();
             	var item = res.rows.item(i);
@@ -81,7 +80,8 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
             	sessionObject.id = item.id;
 				sessionObject.uuid = item.uuid;
             	sessionObject.isSync = item.isSync;
-            	console.log("Session Object: " + sessionObject);
+            	sessionObject.isSent = item.isSent;
+
             	$scope.sessions.push(sessionObject);
             }
 		
@@ -90,85 +90,124 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
         });
 	};
 	$scope.init();
-	
-	
-	var success  =  function(session, imageUri , imageId, recipients)
+
+    $scope.hasSessionToSync = false;
+
+	$scope.$watch("sessions", function(n, o)
+	{
+	    $scope.hasSessionToSync = false;
+
+        angular.forEach(n, function(session, key)
+        {
+            if(!session.isSync && session.hasToSync)
+            {
+                $scope.hasSessionToSync = true;
+            }
+        });
+    }, true );
+
+
+	var success = function(session, imageUri , imageId, recipients)
 	{
 		var db = AppContext.getDbConnection();
 		mySqlDbService.updatePhotoAsSynchronized(db, imageId , 1);
 		$('.syncProgress ').hide();
 	};
-	
+
 	var hadError = false;
-	var error   = function(session, imageUri , imageId, recipients){
-		 hadError = true;
+	var error = function(session, imageUri , imageId, recipients){
+	    hadError = true;
 		console.log("ocurrio un error");
 		$('.syncProgress ').hide();
 	};
 	
-	
+	var syncSessionPhotos = function(db, session)
+	{
+        mySqlDbService.findPhotosForSession(db, session.id).then(function(res)
+        {
+             for (var i=0; i< res.rows.length; i++){
+                    var photo = res.rows.item(i);
+                    console.log("Photo to syncronize...");
+                    console.log(photo);
+                    var imageUri = photo.uri_photo;
+                    var recipients = photo.recipients;
+                    var imageId = photo.uuid;
+                    syncService.uploadPhoto(session, imageUri , imageId, recipients, success, error, i);
+             }
+             if (!hadError)
+             {
+                 mySqlDbService.updateSessionAsSynchronized(db, session.id, 1).then(function(res)
+                 {
+                    session.isSync = 1;
+                    session.hasToSync = 0;
+                 }, function(err)
+                 {
+                    console.log(err);
+                 });
+             }
+        }, function (err) {
+            console.error(err);
+        });
+	};
+
 	$scope.syncSessions = function() 
 	{
-		if (  navigator.connection.type == Connection.NONE)
-			{
-				popupService.openErrorConnectionPopup();
-				return;
-			}
-		
+		if (navigator.connection.type == Connection.NONE)
+	    {
+			popupService.openErrorConnectionPopup();
+			return;
+		}
+
 		var db = AppContext.getDbConnection();
 		var saveSessionUrl = AppContext.getSaveSessionUrl();
-		
+		hadError = false;
+
 		angular.forEach($scope.sessions, function(session, key) 
 		{
-			var dataReq = {
-				"id" : session.uuid,
-				"nombre_operario" : session.operatorFirstName,
-				"apellido_operario" : session.operatorLastName,
-				"lugar" : session.place,
-				"provincia" : session.state,
-				"ciudad" : session.city,
-				"fecha" : session.date,	
-			};
-			if (session.isSync == false && session.hasToSync)
-			{
-				syncService.saveSession(saveSessionUrl, dataReq).success(function(data,status, headers,config ){
-					//TODO : Validar que la sesión no se guarde multiples veces. 
-					console.log("data post save session:");
-					console.log(data);
-					if (data.error == false ){
-							mySqlDbService.findPhotosForSession(db,session.id).then(function(res) {
-								 for (var i=0; i< res.rows.length; i++){
-										var photo = res.rows.item(i); 
-										console.log(photo);
-										var imageUri = photo.uri_photo;
-										var recipients = photo.recipients;
-										var imageId = photo.uuid;
-										syncService.uploadPhoto(session, imageUri , imageId, recipients, success, error, i);
-								 }
-								 if ( !hadError){
-									 console.log("fotos subidas correctamente sincronizando.");
-									 mySqlDbService.updateSessionAsSynchronized(db, session.id, 1).then(
-											 function(res){
-												session.isSync = 1;
-												session.hasToSync = 0;
-											 },
-											 function(err){
-												 console.log(err);
-											 });
-								 }
-							}, function (err) {
-					            console.error(err);
-					        });
-					}//else -> hubo error... analizar que hacer.
-				}).error(
-					function(e){
-						console.log(e);
-						console.log("error de sincronización de sesión");
-						alert("errror de sincronización de sesión. SesionId: " + session.id);
-					}
-				);
+		    if (session.isSync == false && session.hasToSync)
+        	{
+        	    if(!session.isSent)
+        	    {
+                    var dataReq = {
+                        "id" : session.uuid,
+                        "nombre_operario" : session.operatorFirstName,
+                        "apellido_operario" : session.operatorLastName,
+                        "lugar" : session.place,
+                        "provincia" : session.state,
+                        "ciudad" : session.city,
+                        "fecha" : session.date,
+                    };
+
+                    syncService.saveSession(saveSessionUrl, dataReq).success(function(data,status, headers,config )
+                    {
+                        console.log("data post save session:");
+                        console.log(data);
+                        if (data.error == false)
+                        {
+                            mySqlDbService.updateSessionAsSent(db, session.id, 1).then(function(res)
+                            {
+                                //Session synced, now SYNC PHOTOS
+                                session.isSent = 1;
+                                syncSessionPhotos(db, session);
+                            }, function(err)
+                            {
+                                console.log("error to mark session as sent");
+                                console.log(err);
+                            });
+                            syncSessionPhotos(db, session);
+                        }//else -> hubo error... analizar que hacer.
+                    }).error(function(e)
+                    {
+                        console.log(e);
+                        console.log("error de sincronización de sesión");
+                        alert("errror de sincronización de sesión. SesionId: " + session.id);
+                    });
+				}else
+				{
+				    //Session already synced, now SYNC PHOTOS
+				    syncSessionPhotos(db, session);
+				}
 			}
-			hadError = false;
 		});
 
 		popupService.openSyncSuccessPopup();
