@@ -105,15 +105,15 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
             }
         });
     }, true );
-	
-	
+
+
 	var success = function(session, imageUri , imageId, recipients)
 	{
 		var db = AppContext.getDbConnection();
 		mySqlDbService.updatePhotoAsSynchronized(db, imageId , 1);
 		$('.syncProgress ').hide();
 	};
-	
+
 	var hadError = false;
 	var error = function(session, imageUri , imageId, recipients){
 	    hadError = true;
@@ -161,7 +161,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		var db = AppContext.getDbConnection();
 		var saveSessionUrl = AppContext.getSaveSessionUrl();
 		hadError = false;
-		
+
 		angular.forEach($scope.sessions, function(session, key) 
 		{
 		    if (session.isSync == false && session.hasToSync)
@@ -182,11 +182,13 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
                     {
                         console.log("data post save session:");
                         console.log(data);
-                        if (data.error == false )
+                        if (data.error == false)
                         {
                             mySqlDbService.updateSessionAsSent(db, session.id, 1).then(function(res)
                             {
+                                //Session synced, now SYNC PHOTOS
                                 session.isSent = 1;
+                                syncSessionPhotos(db, session);
                             }, function(err)
                             {
                                 console.log("error to mark session as sent");
@@ -202,6 +204,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
                     });
 				}else
 				{
+				    //Session already synced, now SYNC PHOTOS
 				    syncSessionPhotos(db, session);
 				}
 			}
