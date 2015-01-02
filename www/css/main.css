@@ -25,7 +25,8 @@ input[type="url"]:focus,
 input[type="search"]:focus,
 input[type="tel"]:focus,
 input[type="color"]:focus,
-.uneditable-input:focus {   
+.uneditable-input:focus,
+select{
   border-color: none;
   box-shadow: none;
   outline: 0 none;
@@ -142,15 +143,34 @@ button {
 	line-height: 38px;
 }
 
+.form-group .form-control:focus {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
 .form-group input[type="text"],
 .form-group input[type="number"],
-.form-group input[type="email"] {
+.form-group input[type="email"],
+.form-group .select {
 	height: 43px;
 	padding: 6px 18px;
 	background: url(../img/input_background.png) no-repeat;
 	background-size: contain;
 	background-position: center center;
+	color: #000000;
 	font-size: 16px;
+	border: 0;
+}
+
+.form-group .select {
+    padding: 6px 10px;
+}
+
+.form-group .select select {
+    background: none;
+    border: none;
+    color: #000000;
+    font-size: 16px;
 }
 
 .form-group .date .col-xs-4 {
@@ -162,14 +182,14 @@ button {
 		background-size: contain;
 }
 
-.form-group .date input[name="session[date][month]"] {
+/*.form-group .date input[name="session[date][month]"] {
 	background-position: center center;
 }
 
 .form-group .date input[name="session[date][year]"] {
 	background-position: right;
 	padding-left: 28px;
-}
+}*/
 
 .step1 .indications {
 	margin-bottom: 10%;

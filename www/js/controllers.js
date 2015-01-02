@@ -7,7 +7,6 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		email: ''
 	};
 	
-	
 	$scope.persons = [emptyPerson];
 
 	$scope.addPerson = function($event, $index) 
@@ -121,21 +120,23 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		$('.syncProgress ').hide();
 	};
 	
-     function requestMapper(session){
+    var sessionRequestMapper = function(session)
+    {
 		var dataReq = {
-				"id" : session.uuid,
-				"nombre_operario" : session.operatorFirstName,
-				"apellido_operario" : session.operatorLastName,
-				"lugar" : session.place,
-				"provincia" : session.state,
-				"ciudad" : session.city,
-				"fecha" : session.date,	
-			};	
+			"id" : session.uuid,
+			"nombre_operario" : session.operatorFirstName,
+			"apellido_operario" : session.operatorLastName,
+			"lugar" : session.place,
+			"provincia" : session.state,
+			"ciudad" : session.city,
+			"fecha" : session.date,
+		};
 		return dataReq;
 	}
 	
-	function checkConnection(){
-		if (  navigator.connection.type == Connection.NONE)
+	var checkConnection = function()
+	{
+		if (navigator.connection.type == Connection.NONE)
 		{
 			popupService.openErrorConnectionPopup();
 			return false;
@@ -230,15 +231,11 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 
 	$scope.syncSessions = function() 
 	{
-		if (navigator.connection.type == Connection.NONE)
-	    {
-			popupService.openErrorConnectionPopup();
-			return;
-		}
+		if (!checkConnection())
+            return;
 
 		var db = AppContext.getDbConnection();
 		var saveSessionUrl = AppContext.getSaveSessionUrl();
-		hadError = false;
 
 		angular.forEach($scope.sessions, function(session, key) 
 		{
@@ -246,15 +243,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
         	{
         	    if(!session.isSent)
         	    {
-                    var dataReq = {
-                        "id" : session.uuid,
-                        "nombre_operario" : session.operatorFirstName,
-                        "apellido_operario" : session.operatorLastName,
-                        "lugar" : session.place,
-                        "provincia" : session.state,
-                        "ciudad" : session.city,
-                        "fecha" : session.date,
-                    };
+                    var dataReq = sessionRequestMapper(session);
 
                     syncService.saveSession(saveSessionUrl, dataReq).success(function(data,status, headers,config )
                     {
