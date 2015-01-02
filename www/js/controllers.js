@@ -121,6 +121,84 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		$('.syncProgress ').hide();
 	};
 	
+     function requestMapper(session){
+		var dataReq = {
+				"id" : session.uuid,
+				"nombre_operario" : session.operatorFirstName,
+				"apellido_operario" : session.operatorLastName,
+				"lugar" : session.place,
+				"provincia" : session.state,
+				"ciudad" : session.city,
+				"fecha" : session.date,	
+			};	
+		return dataReq;
+	}
+	
+	function checkConnection(){
+		if (  navigator.connection.type == Connection.NONE)
+		{
+			popupService.openErrorConnectionPopup();
+			return false;
+		}
+		return true;
+	}	
+	
+	$scope.syncNew  = function(){
+		if (!checkConnection()) 
+				return ;
+	
+		var db = AppContext.getDbConnection();
+		var saveSessionUrl = AppContext.getSaveSessionUrl();
+		
+		angular.forEach($scope.sessions, function(session, key)
+		{
+			var dataReq = requestMapper(session);
+			if (session.isSync == false && session.hasToSync)
+			{
+				
+					syncService.saveSessionPromise(saveSessionUrl, dataReq).then(
+					function(data){
+						//sendPhotos
+					},
+					function(err){
+						console.log(err);
+					}
+				
+				);
+			}
+		});
+		
+	},
+	
+	
+	$scope.syncPhotosSession = function(session){
+		
+		var db = AppContext.getDbConnection();
+		mySqlDbService.findPhotosForSession(db,session.id).then(
+				function(res){
+					var promises = []; 
+					for (var i=0; i< res.rows.length; i++){
+							var photo = res.rows.item(i); 
+							var p = syncService.uploadPhotoPromise(session, photo, i).then(
+								function(data){
+									
+									console.log("updatear tabal de fotos para actualiar si se envió o no.");
+								},
+								function(err){
+									
+								}
+							);
+							promises.push(p);
+					 }
+					Q.all(promises).then(function(){console.log("actualizar base de datos de la sesion: esta sincronizada o no")});
+				},
+				function(err){
+					console.log(err);				
+				}
+		);
+	}
+
+
 	var syncSessionPhotos = function(db, session)
 	{
         mySqlDbService.findPhotosForSession(db, session.id).then(function(res)
@@ -194,7 +272,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
                                 console.log("error to mark session as sent");
                                 console.log(err);
                             });
-                            syncSessionPhotos(db, session);
+                           
                         }//else -> hubo error... analizar que hacer.
                     }).error(function(e)
                     {
