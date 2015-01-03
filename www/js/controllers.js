@@ -147,58 +147,85 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	$scope.syncNew  = function(){
 		if (!checkConnection()) 
 				return ;
-	
 		var db = AppContext.getDbConnection();
 		var saveSessionUrl = AppContext.getSaveSessionUrl();
 		
 		angular.forEach($scope.sessions, function(session, key)
 		{
-			var dataReq = requestMapper(session);
+			var dataReq = sessionRequestMapper(session);
 			if (session.isSync == false && session.hasToSync)
 			{
-				
-					syncService.saveSessionPromise(saveSessionUrl, dataReq).then(
-					function(data){
-						//sendPhotos
-					},
-					function(err){
-						console.log(err);
-					}
-				
+					syncService.saveSessionPromise(saveSessionUrl, dataReq, session).then(
+						function(data){
+						    mySqlDbService.updateSessionAsSentPromise(db, data.session, 1).then(
+						    		function(data){
+						    			syncPhotosSession(data.session);
+						    		},
+						    		function(data){
+						    			console.log("Error al guarar la session : "+ data.session.id);
+						    		}
+						    );
+						},
+						function(err){
+							console.log(err);
+						}
 				);
 			}
 		});
-		
-	},
+	};
 	
-	
-	$scope.syncPhotosSession = function(session){
-		
+	var syncPhotosSession = function(session){
 		var db = AppContext.getDbConnection();
 		mySqlDbService.findPhotosForSession(db,session.id).then(
 				function(res){
 					var promises = []; 
 					for (var i=0; i< res.rows.length; i++){
-							var photo = res.rows.item(i); 
+							var photo = res.rows.item(i);
+							console.log("subiendo foto: "  + photo.id);
 							var p = syncService.uploadPhotoPromise(session, photo, i).then(
 								function(data){
-									
-									console.log("updatear tabal de fotos para actualiar si se envió o no.");
+									console.log("Foto subida id: " + data.photo.id + " Index : " +  data.photoIndex + " actualizando db...");
+									//Si falla esto, se va a enviar la foto nuevamente cuando se sincronice la session.
+									//Habría que hacer un doble chequeo contra el server. Pero no hay método en la api
+									//para volver atrás el envio.
+									mySqlDbService.updatePhotoAsSynchronized(db, data.photo.id  , 1);
+									//este data que reorno va a ser recibido como parámetro en el then del Q.all.
+									return data;
 								},
-								function(err){
-									
+								function(data){
+									console.log("Ocurrio un error al guardar foto. Id: " + data.photo.id + ". Index : " + data.photoIndex);
 								}
 							);
 							promises.push(p);
 					 }
-					Q.all(promises).then(function(){console.log("actualizar base de datos de la sesion: esta sincronizada o no")});
+					Q.all(promises).then(
+						function(data){
+						console.log("Actualizar base de datos de la sesion...");
+							//Busca nuevamente las fotos para la session que no están sincronizadas.
+							//Si todas están sincdronizadas. Actualizo la sesión como sincronizada.
+							mySqlDbService.countUnsynchronizedPhotos(db,data.session.id).then(
+									function(res){
+										console.log(res);
+										if ( res.lenght == 0){
+											mySqlDbService.updateSessionAsSynchronized(db,data.session.id, 1).then(
+													function(res){
+														console.log("session actualizada: " + res);
+													}
+											);
+										}
+									}
+							);
+						},
+						function(data){
+							console.log("Error al subir alguna de las fotos: "  + data);
+						}
+					);
 				},
 				function(err){
 					console.log(err);				
 				}
 		);
-	}
-
+	};
 
 	var syncSessionPhotos = function(db, session)
 	{

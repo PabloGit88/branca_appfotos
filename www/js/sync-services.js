@@ -62,7 +62,11 @@ angular.module('sync.services', ['ngCordova'])
 	    	var deferred = $q.defer();
 	    	var promise =  deferred.promise();
 			console.log("subiendo foto:")
-
+			var data = {
+				session : session,
+				photo : photo,
+				photoIndex : photoIndex,
+			}
 	    	var ft = new FileTransfer();
 			var dataUploadRequest = mapDataPhotoToUpload(session, photo);
 
@@ -80,12 +84,12 @@ angular.module('sync.services', ['ngCordova'])
 			};
 	        ft.upload(dataUploadRequest.imageUri, dataUploadRequest.serverURL, function (e)
 	        {
-                deferred.resolve(e);
+                deferred.resolve(data);
                 $('.syncProgress').hide();
             },function (e)
             {
                 $('.syncProgress ').hide();
-                deferred.reject(e);
+                deferred.reject(data);
             }, dataUploadRequest.options);
 	        
 	        return promise;
@@ -103,9 +107,14 @@ angular.module('sync.services', ['ngCordova'])
 	    	return $http(req);
         },
 	   
-        saveSessionPromise : function (url, dataReq)
+        saveSessionPromise : function (url, dataReq, session)
         {
-	    	var deferred = Q.defer();
+	    	var data = {
+	    		session: session,
+	    		err : '',
+	    	}
+        	
+        	var deferred = Q.defer();
 			var promise = deferred.promise;
 	    	var req = {
                 method: 'POST',
@@ -116,10 +125,11 @@ angular.module('sync.services', ['ngCordova'])
 
 	    	$http(req).success(function(data,status, headers,config )
 	    	{
-                deferred.resolve();
+                deferred.resolve(data);
             }).error(function(err)
             {
-                deferred.reject(err);
+            	data.err = err;
+                deferred.reject(data);
             });
 
 	    	return promise;

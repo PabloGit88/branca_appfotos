@@ -41,6 +41,7 @@ angular.module('db.services', ['ngCordova'])
         });
 	},
 	
+
 	retrieveSessions : function(db) {
 		var statement = "select * from sessions";
 		return $cordovaSQLite.execute(db,statement , []);
@@ -50,6 +51,12 @@ angular.module('db.services', ['ngCordova'])
 		var statement = "SELECT id_photo, uuid, uri_photo, id_session,recipients,  isSync	FROM session_photo where id_session = ? and isSync = ?";
 		return $cordovaSQLite.execute(db,statement , [sessionId, 0]);
 	},
+	
+	countUnsynchronizedPhotos : function( db, sessionId){
+		var statement = "SELECT count(*) FROM session_photo where id_session = ? and isSync = ?";
+		return $cordovaSQLite.execute(db,statement , [sessionId, 0]);
+	},
+	
 	updatePhotoAsSynchronized : function(db, idPhoto, isSync){
 		var statement = "UPDATE session_photo SET isSync = ? where id_photo = ?";
 		return $cordovaSQLite.execute(db,statement , [isSync, idPhoto]);
@@ -64,5 +71,27 @@ angular.module('db.services', ['ngCordova'])
     	var statement = "UPDATE sessions SET isSent = ? where id = ?";
     	return $cordovaSQLite.execute(db,statement , [isSent, idSession]);
     },
+    
+	updateSessionAsSentPromise : function(db, session, isSent){
+		var data ={
+				session : session,
+				err : "",
+		};
+		
+		var deferred = $q.defer();
+    	var promise =  deferred.promise(); 
+		var statement = "UPDATE sessions SET isSent = ? where id = ?";
+    	$cordovaSQLite.execute(db,statement , [isSent, session.id]).then(
+    			function(res){
+    				deferred.resolve(data);
+    			},
+    			function(err){
+    				data.err = err;
+    				deferred.reject(data);
+    			}
+    	);
+    	return promise;
+	
+	},
  }
 }])
