@@ -79,7 +79,7 @@ angular.module('db.services', ['ngCordova'])
 		};
 		
 		var deferred = $q.defer();
-    	var promise =  deferred.promise(); 
+    	var promise =  deferred.promise; 
 		var statement = "UPDATE sessions SET isSent = ? where id = ?";
     	$cordovaSQLite.execute(db,statement , [isSent, session.id]).then(
     			function(res){

@@ -61,7 +61,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	
 	$rootScope.savePersonList = $scope.savePersonList;
 })
-.controller('SessionsListController', function($scope, AppContext, mySqlDbService, syncService, popupService) {
+.controller('SessionsListController', function($scope, AppContext, mySqlDbService, syncService, popupService, $q) {
 	
 	$scope.sessions = [];
 	$scope.init = function (){
@@ -155,21 +155,32 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 			var dataReq = sessionRequestMapper(session);
 			if (session.isSync == false && session.hasToSync)
 			{
+				if (!session.isSent)	
+				{
 					syncService.saveSessionPromise(saveSessionUrl, dataReq, session).then(
-						function(data){
-						    mySqlDbService.updateSessionAsSentPromise(db, data.session, 1).then(
-						    		function(data){
-						    			syncPhotosSession(data.session);
-						    		},
-						    		function(data){
-						    			console.log("Error al guarar la session : "+ data.session.id);
-						    		}
-						    );
-						},
-						function(err){
-							console.log(err);
-						}
-				);
+							function(data){
+							    console.log("session saved");
+							    console.log(data);
+								mySqlDbService.updateSessionAsSentPromise(db, data.session, 1).then(
+							    		function(data){
+							    			data.session.isSent = 1;
+							    			console.log(data);
+							    			syncPhotosSession(data.session);
+							    		},
+							    		function(data){
+							    			//console.log("Error al guarar la session : "+ data.session.id);
+							    		}
+							    );
+							},
+							function(err){
+								console.log(err);
+								//"ocurrió un error durante la sincronización de una de las sesiones.
+							}
+					);
+				}
+				else{
+					syncPhotosSession(session);
+				}
 			}
 		});
 	};
@@ -198,15 +209,17 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 							);
 							promises.push(p);
 					 }
-					Q.all(promises).then(
+					$q.all(promises).then(
 						function(data){
 						console.log("Actualizar base de datos de la sesion...");
 							//Busca nuevamente las fotos para la session que no están sincronizadas.
 							//Si todas están sincdronizadas. Actualizo la sesión como sincronizada.
-							mySqlDbService.countUnsynchronizedPhotos(db,data.session.id).then(
+							var id = data.session || session.id;
+							
+							mySqlDbService.countUnsynchronizedPhotos(db,id).then(
 									function(res){
 										console.log(res);
-										if ( res.lenght == 0){
+										if ( res.rows.lenght == 0){
 											mySqlDbService.updateSessionAsSynchronized(db,data.session.id, 1).then(
 													function(res){
 														console.log("session actualizada: " + res);
