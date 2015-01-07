@@ -38,7 +38,7 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
     var sessionTableData = "id integer primary key, uuid blob NOT NULL, name varchar(20) NOT NULL, last_name varchar(20) NOT NULL, place varchar(20) NOT NULL, state integer NOT NULL, city varchar(20) NOT NULL, date date NOT NULL, isSync integer, isSent integer NOT NULL DEFAULT 0";
 	mySqlDbService.createTableIfNotExist(db, "sessions" ,sessionTableData );
 	
-	var destinatariesTableData = "id_photo integer primary key, uuid blob NOT NULL, uri_photo varchar(512) NOT NULL, id_session integer, recipients mediumtext NOT NULL, isSync integer";
+	var destinatariesTableData = "id_photo integer primary key, uuid blob NOT NULL, uri_photo varchar(512) NOT NULL, id_session integer, recipients mediumtext NOT NULL, isSync integer, date_created date ";
 	mySqlDbService.createTableIfNotExist(db, "session_photo" ,destinatariesTableData );
 	
 	AppContext.setDbConnection(db);

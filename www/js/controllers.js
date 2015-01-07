@@ -50,6 +50,11 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 			AppContext.incrementCurrentSessionPhotos();
 			$rootScope.currentSessionPhotos = AppContext.getCurrentSessionPhotos();
 			
+			emptyPerson = {
+					firstname: '',
+					lastname: '',
+					email: ''
+				};
 			$scope.persons = [emptyPerson];
 
             $location.path('/session/picture/take');
@@ -149,14 +154,22 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 				return ;
 		var db = AppContext.getDbConnection();
 		var saveSessionUrl = AppContext.getSaveSessionUrl();
+		var promises = [];
 		
 		angular.forEach($scope.sessions, function(session, key)
 		{
+			var  syncPhotosPromise;
+			var  saveSessionPromise;
+			var  updateSessionAsSentPromise;
+			
+			
 			var dataReq = sessionRequestMapper(session);
 			if (session.isSync == false && session.hasToSync)
 			{
 				if (!session.isSent)	
-				{
+				{	
+					var deferred = $q.defer();
+			    	var promise =  deferred.promise;
 					syncService.saveSessionPromise(saveSessionUrl, dataReq, session).then(
 							function(data){
 							    console.log("session saved");
@@ -165,79 +178,129 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 							    		function(data){
 							    			data.session.isSent = 1;
 							    			console.log(data);
-							    			syncPhotosSession(data.session);
+							    			syncPhotosSession(data.session).then(
+							    					function(data) {
+							    						deferred.resolve(data);
+							    					},
+							    					function(data){
+							    						deferred.reject(data);
+							    					}
+							    			);
+							    			
 							    		},
 							    		function(data){
-							    			//console.log("Error al guarar la session : "+ data.session.id);
+							    			console.log("Error al guarar la session : "+ data.session.id);
+							    			deferred.reject(data);
 							    		}
 							    );
 							},
 							function(err){
 								console.log(err);
-								//"ocurrió un error durante la sincronización de una de las sesiones.
+								deferred.reject(err);
 							}
 					);
+					promises.push(promise);
 				}
 				else{
-					syncPhotosSession(session);
+					p =  syncPhotosSession(session);
+					promises.push(p);
 				}
 			}
+			
 		});
+		
+		$q.all(promises).then(
+				function(data){
+					console.log("terminaron todas las promesas con exito " + data ); 
+					popupService.openSyncSuccessPopup();
+				},
+				function(data){
+					console.log("alguna promesa fallo : " + data);
+					alert("Ocurrió un error durante la sincronización.");
+					alert("Algunas sesiones podrían requerir una nueva sincronización");
+				}
+			);
+		
 	};
 	
 	var syncPhotosSession = function(session){
+		var deferred = $q.defer();
+    	var promise =  deferred.promise;
 		var db = AppContext.getDbConnection();
 		mySqlDbService.findPhotosForSession(db,session.id).then(
 				function(res){
 					var promises = []; 
 					for (var i=0; i< res.rows.length; i++){
 							var photo = res.rows.item(i);
-							console.log("subiendo foto: "  + photo.id);
+							console.log("subiendo foto id: "  + photo.id_photo + " photo object: " + photo );
 							var p = syncService.uploadPhotoPromise(session, photo, i).then(
 								function(data){
 									console.log("Foto subida id: " + data.photo.id + " Index : " +  data.photoIndex + " actualizando db...");
 									//Si falla esto, se va a enviar la foto nuevamente cuando se sincronice la session.
 									//Habría que hacer un doble chequeo contra el server. Pero no hay método en la api
 									//para volver atrás el envio.
-									mySqlDbService.updatePhotoAsSynchronized(db, data.photo.id  , 1);
+									mySqlDbService.updatePhotoAsSynchronized(db, data.photo.id_photo  , 1);
 									//este data que reorno va a ser recibido como parámetro en el then del Q.all.
 									return data;
 								},
 								function(data){
-									console.log("Ocurrio un error al guardar foto. Id: " + data.photo.id + ". Index : " + data.photoIndex);
+									console.log("Ocurrio un error al guardar foto. Id: " + data.photo.id_photo + ". Index : " + data.photoIndex);
 								}
 							);
 							promises.push(p);
 					 }
 					$q.all(promises).then(
-						function(data){
-						console.log("Actualizar base de datos de la sesion...");
-							//Busca nuevamente las fotos para la session que no están sincronizadas.
-							//Si todas están sincdronizadas. Actualizo la sesión como sincronizada.
-							var id = data.session || session.id;
-							
-							mySqlDbService.countUnsynchronizedPhotos(db,id).then(
-									function(res){
-										console.log(res);
-										if ( res.rows.lenght == 0){
-											mySqlDbService.updateSessionAsSynchronized(db,data.session.id, 1).then(
-													function(res){
-														console.log("session actualizada: " + res);
-													}
-											);
-										}
-									}
-							);
-						},
-						function(data){
-							console.log("Error al subir alguna de las fotos: "  + data);
-						}
+							function(data){
+								console.log("Actualizar base de datos de la sesion...");
+									//Busca nuevamente las fotos para la session que no están sincronizadas.
+									//Si todas están sincdronizadas. Actualizo la sesión como sincronizada.
+								var id;	
+								if (typeof data.session != 'undefined')
+								{ 	console.log(id);	
+									id = data.session.id;
+								}
+								else
+								{
+									console.log(id) ; 
+									id =  session.id; 
+								}
+									
+								mySqlDbService.countUnsynchronizedPhotos(db,id).then(
+											function(res){
+												console.log(res.rows.item(0));
+												if ( res.rows.item(0).quantity  == 0){
+													mySqlDbService.updateSessionAsSynchronized(db,id, 1).then(
+															function(res){
+																console.log("session actualizada: " + res);
+																session.isSync = 1;
+																deferred.resolve();
+															},
+															function(res){
+																console.log("session actualizada: " + res);
+																session.isSync = 1;
+																deferred.reject("Error al guardar");
+															}
+													);
+												}
+											},
+											function(res){
+												deferred.reject("Error al guardar");
+											}
+									);
+							},
+							function(data){
+								console.log("Error al subir alguna de las fotos: "  + data);
+								deferred.reject("Error al subir fotos");
+							}
 					);
 				},
 				function(err){
-					console.log(err);				
+					console.log(err);		
+					deferred.reject("Error al subir fotos");
 				}
 		);
+		
+		return promise;
 	};
 
 	var syncSessionPhotos = function(db, session)
@@ -366,14 +429,22 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		event.preventDefault();
 		if (validatorService.validateSession($scope.session))
 		{
-			mySqlDbService.saveSession(AppContext.getDbConnection(), $scope.session ).then(function(res) {
-				console.log("NewSessionController idSession: " +  res.insertId);
-				AppContext.saveSessionId( res.insertId); 
-				$scope.session = Session();
-				$location.path('/session/picture/take'); 
-	        }, function (err) {
-	            console.error(err);
-	        });
+			if(validatorService.hasValidDate($scope.session))
+			{
+				mySqlDbService.saveSession(AppContext.getDbConnection(), $scope.session ).then(function(res) {
+					console.log("NewSessionController idSession: " +  res.insertId);
+					AppContext.saveSessionId( res.insertId); 
+					$scope.session = Session();
+					$location.path('/session/picture/take'); 
+		        }, function (err) {
+		            console.error(err);
+		            alert(err);
+		        });
+			}
+			else
+			{
+				alert("Fecha Inválida");
+			}
 		}else{
 			popupService.openFormErrorPopup();
 		}

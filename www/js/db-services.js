@@ -33,7 +33,7 @@ angular.module('db.services', ['ngCordova'])
 	{
 		var uuid = this.generateUuid();
 		console.log("Photo uuid generated: "+uuid);
-		var statement = "INSERT INTO session_photo(uuid, uri_photo, id_session, recipients, isSync ) VALUES (?,?,?,?,?)";
+		var statement = "INSERT INTO session_photo(uuid, uri_photo, id_session, recipients, isSync, date_created ) VALUES (?,?,?,?,?,  datetime() )";
 		$cordovaSQLite.execute(db,statement , [uuid, imageUri, sesssionId, recipients, isSync ]).then(function(res) {
             console.log("INSERT ID -> " + res.insertId);
         }, function (err) {
@@ -53,7 +53,7 @@ angular.module('db.services', ['ngCordova'])
 	},
 	
 	countUnsynchronizedPhotos : function( db, sessionId){
-		var statement = "SELECT count(*) FROM session_photo where id_session = ? and isSync = ?";
+		var statement = "SELECT count(*)  as quantity FROM session_photo where id_session = ? and isSync = ?";
 		return $cordovaSQLite.execute(db,statement , [sessionId, 0]);
 	},
 	
