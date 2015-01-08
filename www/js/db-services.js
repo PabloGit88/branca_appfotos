@@ -22,10 +22,13 @@ angular.module('db.services', ['ngCordova'])
 	},
 	
 	saveSession : function(db, session){
-		var date = session.day + "/" + session.month + "/" + session.year;
+		
+		//var date = session.day + "/" + session.month + "/" + session.year;
+		//nuevo formato pedido
+		var date = session.year + "-" + session.month + "-" + session.day;
 		var uuid = this.generateUuid();
 		console.log("Session uuid generated: "+uuid);
-		var statement = "INSERT INTO sessions(uuid, name, last_name, place, state, city, date ,isSync ) VALUES (?,?,?,?,?,?,?,?)";
+		var statement = "INSERT INTO sessions(uuid, name, last_name, place, state, city, date ,isSync,date_created ) VALUES (?,?,?,?,?,?,?,?, datetime())";
 		return  $cordovaSQLite.execute(db,statement , [uuid, session.operatorFirstName, session.operatorLastName, session.place, session.state, session.city, date , 0 ]);
 	},
 	
@@ -48,7 +51,7 @@ angular.module('db.services', ['ngCordova'])
 	},
 	
 	findPhotosForSession : function( db, sessionId){
-		var statement = "SELECT id_photo, uuid, uri_photo, id_session,recipients,  isSync	FROM session_photo where id_session = ? and isSync = ?";
+		var statement = "SELECT id_photo, uuid, uri_photo, id_session,recipients, date_created,  isSync	FROM session_photo where id_session = ? and isSync = ?";
 		return $cordovaSQLite.execute(db,statement , [sessionId, 0]);
 	},
 	

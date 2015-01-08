@@ -85,6 +85,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 				sessionObject.uuid = item.uuid;
             	sessionObject.isSync = item.isSync;
             	sessionObject.isSent = item.isSent;
+            	sessionObject.dateCreated = item.date_created;
 
             	$scope.sessions.push(sessionObject);
             }
@@ -127,7 +128,10 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 	
     var sessionRequestMapper = function(session)
     {
-		var dataReq = {
+    	var  d = new Date(session.dateCreated);
+    	var fechaFormateada = d.format("yyyy-mm-dd");
+    	console.log(fechaFormateada);
+    	var dataReq = {
 			"id" : session.uuid,
 			"nombre_operario" : session.operatorFirstName,
 			"apellido_operario" : session.operatorLastName,
@@ -135,7 +139,9 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 			"provincia" : session.state,
 			"ciudad" : session.city,
 			"fecha" : session.date,
+			"fecha_creacion": fechaFormateada
 		};
+		console.log("Formato fecha: " + dataReq.fecha);
 		return dataReq;
 	}
 	
