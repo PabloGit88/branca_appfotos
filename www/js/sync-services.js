@@ -89,17 +89,22 @@ angular.module('sync.services', ['ngCordova'])
 			};
 	        ft.upload(dataUploadRequest.imageUri, dataUploadRequest.serverURL, function (e)
 	        {
-                if (data.error == true)
+                if (data.error == true){
                 	deferred.reject(data);
-	        	deferred.resolve(data);
-	        	console.log("resultado de subir foto. Data:");
+                }
+                else {
+                	deferred.resolve(data);
+	        	}
+                console.log("resultado de subir foto. Data:");
 	        	console.log(e);
                 $('.syncProgress').hide();
                 
             },function (e)
             {
                 $('.syncProgress ').hide();
-                deferred.reject(data);
+                if ( FileTransferError.FILE_NOT_FOUND_ERR  == e.code)
+                	deferred.resolve(data);
+                else  deferred.reject(data);
                 console.log(e);
             }, dataUploadRequest.options);
 	        

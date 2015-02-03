@@ -36,11 +36,9 @@ angular.module('photoApp', ['ionic', 'photo.services'])
 			function(imageURI) {
 			  console.log(imageURI);
 			  $scope.lastPhoto = imageURI;
-			  alert(imageURI);
 			  camService.upload(imageURI);
 			},
 			function(err) {
-			  console.err(err);
 			  alert("error");
 			}
 			);

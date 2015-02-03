@@ -5,7 +5,6 @@ angular.module('photo.services', [])
   return {
     getPicture: function(options) {
       var q = $q.defer();
-      alert('taking pciture');
       navigator.camera.getPicture(function(result) {
         q.resolve(result);
       }, function(err) {
@@ -27,7 +26,6 @@ angular.module('photo.services', [])
             
              ft.upload(imageURI, serverURL,
                 function (e) {
-                   alert('ok');
                    console.log(e);
                 },
                 function (e) {

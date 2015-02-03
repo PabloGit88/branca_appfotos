@@ -32,7 +32,7 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
 	$rootScope.currentSessionPhotos = 0;
 	
 	AppContext.setDeviceUUID(device.uuid);
-	db = mySqlDbService.openOrCreateDb('photo_email_branca.db');
+	db = mySqlDbService.openOrCreateDb('photo_email_branca_1_0_0.db');
 	console.log("conexion: " + Connection.NONE + " -    " + Connection.CELL_3G);
    
     var sessionTableData = "id integer primary key, uuid blob NOT NULL, name varchar(20) NOT NULL, last_name varchar(20) NOT NULL, place varchar(20) NOT NULL, state integer NOT NULL, city varchar(20) NOT NULL, date date NOT NULL, isSync integer, isSent integer NOT NULL DEFAULT 0, date_created date";
