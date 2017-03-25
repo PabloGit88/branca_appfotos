@@ -32,7 +32,7 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
 	$rootScope.currentSessionPhotos = 0;
 	
 	AppContext.setDeviceUUID(device.uuid);
-	db = mySqlDbService.openOrCreateDb('photo_email_branca_1_0_0.db');
+	db = mySqlDbService.openOrCreateDb('branca_app_especialista_photos_1_3_0.db');
 	console.log("conexion: " + Connection.NONE + " -    " + Connection.CELL_3G);
    
     var sessionTableData = "id integer primary key, uuid blob NOT NULL, name varchar(20) NOT NULL, last_name varchar(20) NOT NULL, place varchar(20) NOT NULL, state integer NOT NULL, city varchar(20) NOT NULL, date date NOT NULL, isSync integer, isSent integer NOT NULL DEFAULT 0, date_created date";
@@ -97,7 +97,7 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
         DbConnection : '',
         SessionId : '',
         currentSessionPhotos : 0,
-        SaveSessionUrl : "http://test3.bblabs.com.ar/playup_fotos_2015/web/api/guardar-sesion", //"http://www.odiseo.com.ar/projects/brancaAppPhotos/guardar-sesion.php", 
+        SaveSessionUrl : "http://test3.bbdev.com.ar/playup_fotos_2015/web/api/guardar-sesion", //"http://www.odiseo.com.ar/projects/brancaAppPhotos/guardar-sesion.php", 
         DeviceUUID: 0,
     };
 
@@ -158,5 +158,32 @@ angular.module('branca_appfotos', ['ionic', 'branca_appfotos.controllers', 'db.s
         getDeviceUUID : function(){
         	return data.DeviceUUID;
         },
+        logToFile : function(logText){
+
+              var gotFs = function(fileSystem) {
+
+                  fileSystem.root.getFile("branca_especialista_log.txt", {create: false, exclusive: false}, gotFileEntry, function(error){
+                      fileSystem.root.getFile("branca_especialista_log.txt", {create: true, exclusive: false}, gotFileEntry, function(error){
+                        console.log(error);
+                       });  
+                  });
+              };
+
+              var  gotFileEntry = function(fileEntry) {
+                  fileEntry.createWriter(gotFileWriter, fail);
+              };
+
+              var  gotFileWriter  = function(writer) {
+                    writer.seek(writer.length);
+                    writer.write(logText + '.\r\n');
+                  };
+
+              var fail = function(error) {
+                        console.log(error);
+              };
+              
+              window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, gotFs, fail);
+        }
+
     };
 });

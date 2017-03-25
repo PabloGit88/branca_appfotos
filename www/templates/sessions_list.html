@@ -15,7 +15,7 @@
 			<td>{{ session.operatorFirstName + ' ' + session.operatorLastName  }}</td>
 			<td>{{ session.isSync?'Sinc.':'No sinc.' }}</td>
 			<!--  CORREGIR NG-MODEL, AHORA ESTA SINCRONIZANDO TODOS -->
-			<td><input type="checkbox" value="session.isSync" ng-model="session.hasToSync" ng-disabled="session.isSync" ng-checked="session.isSync"></td>
+			<td class="last"><input type="checkbox" value="session.isSync" ng-model="session.hasToSync" ng-disabled="session.isSync" ng-checked="session.isSync"></td>
 		</tr>
 	</table>
   </ion-content>

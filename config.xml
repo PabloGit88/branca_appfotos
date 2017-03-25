@@ -1,19 +1,22 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<widget id="com.odiseo.branca_app_photos" version="0.1.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-  <name>Branca Fotos</name>
+<?xml version="1.3.0" encoding="UTF-8" standalone="yes"?>
+<widget id="com.odiseo.branca_app_especialista_photos" version="0.1.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+  <name>Branca El Especialista Fotos</name>
   <description>
-        Branca App Fotos
+        Branca  El Especialista App Fotos
     </description>
   <author email="odiseo.team@gmail.com" href="http://odiseo.com.ar">
       Odiseo Team
     </author>
   <content src="index.html"/>
   <access origin="*"/>
+  <allow-navigation href="http://*/*" />
   <preference name="webviewbounce" value="false"/>
   <preference name="orientation" value="portrait" />
   <preference name="UIWebViewBounce" value="false"/>
   <preference name="DisallowOverscroll" value="true"/>
   <preference name="BackupWebStorage" value="none"/>
+  <preference name="AndroidPersistentFileLocation" value="Compatibility" />
+  <preference name="loadUrlTimeoutValue" value="700000" />
   <feature name="StatusBar">
     <param name="ios-package" value="CDVStatusBar" onload="true"/>
   </feature>

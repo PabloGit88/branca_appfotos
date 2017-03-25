@@ -253,3 +253,12 @@ button {
 	text-align: center;
 	display: none;
 }
+
+.sessionsList table tr td.last {
+	width: 15%;
+}
+
+.sessionsList table tr td.last input {
+	width: 100%;
+	height: 100%;
+}

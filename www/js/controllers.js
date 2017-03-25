@@ -88,6 +88,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
             	sessionObject.dateCreated = item.date_created;
 
             	$scope.sessions.push(sessionObject);
+            	
             }
 		
 		}, function (err) {
@@ -139,7 +140,8 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 			"provincia" : session.state,
 			"ciudad" : session.city,
 			"fecha" : session.date,
-			"fecha_creacion": fechaFormateada
+			"fecha_creacion": fechaFormateada,
+			"fuente" : "branca"
 		};
 		console.log("Formato fecha: " + dataReq.fecha);
 		return dataReq;
@@ -176,9 +178,11 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 				{	
 					var deferred = $q.defer();
 			    	var promise =  deferred.promise;
+					AppContext.logToFile("sesión a sincronizar: " + session.uuid + " - " + session.operatorFirstName + " - " + session.place + " - " + session.date + " - " + session.city  );
+
 					syncService.saveSessionPromise(saveSessionUrl, dataReq, session).then(
 							function(data){
-							    console.log("session saved");
+							    AppContext.logToFile("session saved");
 							    console.log(data);
 								mySqlDbService.updateSessionAsSentPromise(db, data.session, 1).then(
 							    		function(data){
@@ -195,12 +199,13 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 							    			
 							    		},
 							    		function(data){
-							    			console.log("Error al guarar la session : "+ data.session.id);
+							    			console.log("Error al guardar la session : "+ data.session.uuid  + data.session.operatorFirstName + " - " + data.session.place + " - " + data.session.date + " - " + data.session.city);
 							    			deferred.reject(data);
 							    		}
 							    );
 							},
 							function(err){
+								AppContext.logToFile("sesion no guardada: " + err);
 								console.log(err);
 								deferred.reject(err);
 							}
@@ -211,6 +216,9 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 					p =  syncPhotosSession(session);
 					promises.push(p);
 				}
+			}
+			else{
+				AppContext.logToFile("sesión ya sincronizada: " + session.uuid + " - " + session.operatorFirstName + " - " + session.place + " - " + session.date + " - " + session.city  );
 			}
 			
 		});
@@ -238,18 +246,21 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 					var promises = []; 
 					for (var i=0; i< res.rows.length; i++){
 							var photo = res.rows.item(i);
-							console.log("subiendo foto id: "  + photo.id_photo + " photo object: " + photo );
+							AppContext.logToFile("subiendo foto id: "  + photo.id_photo + " photo date: " + photo.date_created  );
 							var p = syncService.uploadPhotoPromise(session, photo, i).then(
 								function(data){
+									AppContext.logToFile("Foto subida id: " + data.photo.id + " Index : " +  data.photoIndex + " actualizando db..." );
 									console.log("Foto subida id: " + data.photo.id + " Index : " +  data.photoIndex + " actualizando db...");
 									//Si falla esto, se va a enviar la foto nuevamente cuando se sincronice la session.
 									//Habría que hacer un doble chequeo contra el server. Pero no hay método en la api
 									//para volver atrás el envio.
 									mySqlDbService.updatePhotoAsSynchronized(db, data.photo.id_photo  , 1);
+									AppContext.logToFile("foto actualizada como sincronizada: " + data.photo.id_photo);
 									//este data que reorno va a ser recibido como parámetro en el then del Q.all.
 									return data;
 								},
 								function(data){
+									AppContext.logToFile("Ocurrio un error al guardar foto. Id: " + data.photo.id_photo + ". Index : " + data.photoIndex);
 									console.log("Ocurrio un error al guardar foto. Id: " + data.photo.id_photo + ". Index : " + data.photoIndex);
 								}
 							);
@@ -258,6 +269,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 					$q.all(promises).then(
 							function(data){
 								console.log("Actualizar base de datos de la sesion...");
+								AppContext.logToFile("Actualizar base de datos de la sesion...");
 									//Busca nuevamente las fotos para la session que no están sincronizadas.
 									//Si todas están sincdronizadas. Actualizo la sesión como sincronizada.
 								var id;	
@@ -278,12 +290,14 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 													mySqlDbService.updateSessionAsSynchronized(db,id, 1).then(
 															function(res){
 																console.log("session actualizada: " + res);
+																AppContext.logToFile("sesion guardada como actualizda: " + id);
 																session.isSync = 1;
 																deferred.resolve();
 															},
 															function(res){
 																console.log("session actualizada: " + res);
-																session.isSync = 1;
+																session.isSync = 0;
+																AppContext.logToFile("sesion NO guardada como actualizda: " + id);
 																deferred.reject("Error al guardar");
 															}
 													);
@@ -295,6 +309,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 									);
 							},
 							function(data){
+								AppContext.logToFile("Error al subir alguna de las fotos");
 								console.log("Error al subir alguna de las fotos: "  + data);
 								deferred.reject("Error al subir fotos");
 							}
@@ -302,6 +317,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 				},
 				function(err){
 					console.log(err);		
+					AppContext.logToFile("Error al subir fotos");
 					deferred.reject("Error al subir fotos");
 				}
 		);
@@ -402,7 +418,8 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		  saveToPhotoAlbum: true,
 		  destinationType: Camera.DestinationType.FILE_URI,
 		  encodingType: Camera.EncodingType.JPEG,
-		  sourceType: Camera.PictureSourceType.CAMERA
+		  sourceType: Camera.PictureSourceType.CAMERA,
+		  allowEdit: true
 	};
 		
 	camService.getPicture(options).then(
@@ -412,7 +429,7 @@ angular.module('branca_appfotos.controllers', [ 'photo.services', 'branca_appfot
 		    	$location.path('/session/picture/persons');  
 			},
 			function(err) {
-		   		alert("Por favor, intente nuevamente.");
+		   		console.log("ERROR: " + err);
 			}
 		);
 	};
